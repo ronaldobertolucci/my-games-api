@@ -17,10 +17,18 @@ public class Company {
     private String name;
 
     public Company(SaveCompanyDto dto) {
-        this.name = dto.name();
+        this.name = normalizeName(dto.name());
     }
 
     public void update(UpdateCompanyDto dto) {
-        this.name = dto.name();
+        this.name = normalizeName(dto.name());
+    }
+
+    public void setName(String name) {
+        this.name = normalizeName(name);
+    }
+
+    private String normalizeName(String name) {
+        return name.toLowerCase().trim();
     }
 }

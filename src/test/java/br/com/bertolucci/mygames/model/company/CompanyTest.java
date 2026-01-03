@@ -25,25 +25,25 @@ class CompanyTest {
     void deveSalvarCompanhiaComNome() {
         // given
         var company = new Company();
-        company.setName("Company name");
+        company.setName("Company name ");
         em.persist(company);
 
         //then
         Company loadedCompany = repository.getReferenceById(company.getId());
-        assertEquals("Company name", loadedCompany.getName());
+        assertEquals("company name", loadedCompany.getName());
     }
 
     @Test
     void deveAtualizarCompanhiaComNome() {
         // given
         var company = new Company();
-        company.setName("Company name");
+        company.setName("Company name ");
         em.persist(company);
 
         Company loadedCompany = repository.getReferenceById(company.getId());
 
         //then
         loadedCompany.update(new UpdateCompanyDto(loadedCompany.getId(), "New name"));
-        assertEquals("New name", loadedCompany.getName());
+        assertEquals("new name", loadedCompany.getName());
     }
 }

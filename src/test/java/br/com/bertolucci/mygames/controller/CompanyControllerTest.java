@@ -46,16 +46,16 @@ class CompanyControllerTest {
 
         mockMvc.perform(get("/companies"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[0].name").value("Company Name"));
+                .andExpect(jsonPath("$.content[0].name").value("company name"));
     }
 
     @Test
     void deveDetalharCompanhia() throws Exception {
-        when(companyService.detail(1L)).thenReturn(new CompanyDto(1L, "Company Name"));
+        when(companyService.detail(1L)).thenReturn(new CompanyDto(1L, "company name"));
 
         mockMvc.perform(get("/companies/{id}", 1L))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("Company Name"));
+                .andExpect(jsonPath("$.name").value("company name"));
     }
 
     @Test
@@ -89,7 +89,7 @@ class CompanyControllerTest {
             }
             """;
 
-        when(companyService.save(any())).thenReturn(new CompanyDto(1L,"Company name"));
+        when(companyService.save(any())).thenReturn(new CompanyDto(1L,"company name"));
 
         mockMvc.perform(post("/companies")
                         .contentType(MediaType.APPLICATION_JSON)
