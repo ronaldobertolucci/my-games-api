@@ -2,8 +2,6 @@ package io.github.ronaldobertolucci.mygames.service.platform;
 
 import io.github.ronaldobertolucci.mygames.model.platform.*;
 import io.github.ronaldobertolucci.mygames.model.platform.*;
-import io.github.ronaldobertolucci.mygames.model.store.Store;
-import io.github.ronaldobertolucci.mygames.model.store.StoreRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -15,9 +13,6 @@ public class PlatformService {
 
     @Autowired
     private PlatformRepository platformRepository;
-
-    @Autowired
-    private StoreRepository storeRepository;
 
     public Page<PlatformDto> findAll(Pageable pageable) {
         Page<Platform> platforms = platformRepository.findAll(pageable);
@@ -31,19 +26,15 @@ public class PlatformService {
 
     @Transactional
     public PlatformDto save(SavePlatformDto dto) {
-        Store store = storeRepository.getReferenceById(dto.storeId());
-
-        Platform platform = new Platform(dto.name(), store);
+        Platform platform = new Platform(dto);
         platformRepository.save(platform);
         return new PlatformDto(platform);
     }
 
     @Transactional
     public PlatformDto update(UpdatePlatformDto dto) {
-        Store store = storeRepository.getReferenceById(dto.storeId());
-
         Platform platform = platformRepository.getReferenceById(dto.id());
-        platform.update(dto.name(), store);
+        platform.update(dto);
         return new PlatformDto(platform);
     }
 

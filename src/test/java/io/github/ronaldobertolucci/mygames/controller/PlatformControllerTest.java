@@ -40,34 +40,24 @@ class PlatformControllerTest {
 
     @Test
     void deveListarTodasAsPlataformas() throws Exception {
-        var store = new Store();
-        store.setId(1L);
-        store.setName("Store Name");
-        var platform = new Platform(new SavePlatformDto("Platform Name", 1L));
-        platform.setStore(store);
-
         Page<Platform> platforms = new PageImpl<>(
-                List.of(platform),
+                List.of(new Platform(new SavePlatformDto("Platform Name"))),
                 PageRequest.of(0,20),
                 1);
         when(platformService.findAll(any())).thenReturn(platforms.map(PlatformDto::new));
 
         mockMvc.perform(get("/platforms"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[0].name").value("platform name"))
-                .andExpect(jsonPath("$.content[0].store.id").value(1L))
-                .andExpect(jsonPath("$.content[0].store.name").value("store name"));
+                .andExpect(jsonPath("$.content[0].name").value("platform name"));
     }
 
     @Test
     void deveDetalharPlataforma() throws Exception {
-        when(platformService.detail(1L)).thenReturn(new PlatformDto(1L, "platform name", new StoreDto(1L, "store name")));
+        when(platformService.detail(1L)).thenReturn(new PlatformDto(1L, "platform name" ));
 
         mockMvc.perform(get("/platforms/{id}", 1L))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("platform name"))
-                .andExpect(jsonPath("$.store.id").value(1L))
-                .andExpect(jsonPath("$.store.name").value("store name"));
+                .andExpect(jsonPath("$.name").value("platform name"));
     }
 
     @Test
@@ -83,24 +73,9 @@ class PlatformControllerTest {
     void deveFalharQuandoNomeInvalidoNaCriacao(String name) throws Exception {
         String requestBody = """
             {
-                "name": "%s",
-                "store_id": 1
+                "name": "%s"
             }
             """.formatted(name);
-
-        mockMvc.perform(post("/platforms")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void deveFalharQuandoIdStoreNuloNaCriacao() throws Exception {
-        String requestBody = """
-            {
-                "name": "Platform name"
-            }
-            """;
 
         mockMvc.perform(post("/platforms")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -112,12 +87,11 @@ class PlatformControllerTest {
     void deveCriarQuandoValidoNaCriacao() throws Exception {
         String requestBody = """
             {
-                "name": "Platform name",
-                "store_id": 1
+                "name": "Platform name"
             }
             """;
 
-        when(platformService.save(any())).thenReturn(new PlatformDto(1L,"platform name", new StoreDto(1L, "store name")));
+        when(platformService.save(any())).thenReturn(new PlatformDto(1L,"platform name"));
 
         mockMvc.perform(post("/platforms")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -131,25 +105,9 @@ class PlatformControllerTest {
         String requestBody = """
             {
                 "id": 1,
-                "name": "%s",
-                "store_id": 1
-            }
-            """.formatted(name);
-
-        mockMvc.perform(put("/platforms")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    void deveFalharQuandoIdStoreNuloNaAtualizacao() throws Exception {
-        String requestBody = """
-            {
-                "id": 1,
                 "name": "%s"
             }
-            """;
+            """.formatted(name);
 
         mockMvc.perform(put("/platforms")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -161,8 +119,7 @@ class PlatformControllerTest {
     void deveFalharQuandoIdNuloNaAtualizacao() throws Exception {
         String requestBody = """
             {
-                "name": "Platform Name",
-                "store_id": 1
+                "name": "Platform Name"
             }
             """;
 

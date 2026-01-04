@@ -29,116 +29,26 @@ class PlatformTest {
     @Test
     void deveSalvarPlataformaComDadosCorretos() {
         // given
-        var store = new Store();
-        store.setName("Store name");
-        em.persist(store);
-
         var platform = new Platform();
         platform.setName("Platform name ");
-        platform.setStore(store);
         em.persist(platform);
 
         //then
         Platform loadedPlatform = platformRepository.getReferenceById(platform.getId());
         assertEquals("platform name", loadedPlatform.getName());
-        assertEquals(store.getId(), loadedPlatform.getStore().getId());
-    }
-
-    @Test
-    void deveSalvarQuandoMesmoNomeMasLojaDiferente() {
-        var store1 = new Store();
-        store1.setName("Store name");
-        em.persist(store1);
-
-        var platform1 = new Platform();
-        platform1.setName("Platform name ");
-        platform1.setStore(store1);
-        em.persist(platform1);
-
-        var store2 = new Store();
-        store2.setName("Store name 2");
-        em.persist(store2);
-
-        var platform2 = new Platform();
-        platform2.setName("Platform name ");
-        platform2.setStore(store2);
-        em.persist(platform2);
-    }
-
-    @Test
-    void deveSalvarQuandoMesmaLojaMasNomeDiferente() {
-        var store1 = new Store();
-        store1.setName("Store name");
-        em.persist(store1);
-
-        var platform1 = new Platform();
-        platform1.setName("Platform name ");
-        platform1.setStore(store1);
-        em.persist(platform1);
-
-        var platform2 = new Platform();
-        platform2.setName("Platform name 2");
-        platform2.setStore(store1);
-        em.persist(platform2);
-    }
-
-    @Test
-    void deveFalharQuandoMesmaLojaMesmoNome() {
-        var store1 = new Store();
-        store1.setName("Store name");
-        em.persist(store1);
-
-        var platform1 = new Platform();
-        platform1.setName("Platform name");
-        platform1.setStore(store1);
-        em.persist(platform1);
-
-        var platform2 = new Platform();
-        platform2.setName("Platform name");
-        platform2.setStore(store1);
-        assertThrows(org.hibernate.exception.ConstraintViolationException.class, () -> em.persist(platform2));
-    }
-
-    @Test
-    void deveSalvarPlataformaComNome() {
-        // given
-        var store = new Store();
-        store.setName("Store name");
-        em.persist(store);
-
-        var platform = new Platform();
-        platform.setName("Platform name ");
-        platform.setStore(store);
-        em.persist(platform);
-
-        //then
-        Platform loadedPlatform = platformRepository.getReferenceById(platform.getId());
-        assertEquals("platform name", loadedPlatform.getName());
-        assertEquals(store.getId(), loadedPlatform.getStore().getId());
     }
 
     @Test
     void deveAtualizarPlataformaComNome() {
         // given
-        var store1 = new Store();
-        store1.setName("Store name");
-        em.persist(store1);
-
-        var store2 = new Store();
-        store2.setName("Store name 2");
-        em.persist(store2);
-
         var platform = new Platform();
         platform.setName("Platform name ");
-        platform.setStore(store1);
         em.persist(platform);
 
         Platform loadedPlatform = platformRepository.getReferenceById(platform.getId());
-        Store loadedStore = storeRepository.getReferenceById(store2.getId());
 
         //then
-        loadedPlatform.update("New name ", loadedStore);
+        loadedPlatform.update(new UpdatePlatformDto(loadedPlatform.getId(), "New name "));
         assertEquals("new name", loadedPlatform.getName());
-        assertEquals(store2.getId(), loadedPlatform.getStore().getId());
     }
 }
