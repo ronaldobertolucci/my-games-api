@@ -1,0 +1,51 @@
+package io.github.ronaldobertolucci.mygames.model.stores;
+
+import io.github.ronaldobertolucci.mygames.model.store.Store;
+import io.github.ronaldobertolucci.mygames.model.store.StoreRepository;
+import io.github.ronaldobertolucci.mygames.model.store.UpdateStoreDto;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
+import org.springframework.boot.jpa.test.autoconfigure.TestEntityManager;
+import org.springframework.test.context.ActiveProfiles;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+@DataJpaTest
+@AutoConfigureTestDatabase(replace = AutoConfigureTestDatabase.Replace.NONE)
+@ActiveProfiles("test")
+class StoreTest {
+
+    @Autowired
+    private TestEntityManager em;
+
+    @Autowired
+    private StoreRepository repository;
+
+    @Test
+    void deveSalvarLojaComNome() {
+        // given
+        var store = new Store();
+        store.setName("Store name ");
+        em.persist(store);
+
+        //then
+        Store loadedStore = repository.getReferenceById(store.getId());
+        assertEquals("store name", loadedStore.getName());
+    }
+
+    @Test
+    void deveAtualizarLojaComNome() {
+        // given
+        var store = new Store();
+        store.setName("Store name ");
+        em.persist(store);
+
+        Store loadedStore = repository.getReferenceById(store.getId());
+
+        //then
+        loadedStore.update(new UpdateStoreDto(loadedStore.getId(), "New name"));
+        assertEquals("new name", loadedStore.getName());
+    }
+}

@@ -8,7 +8,7 @@
 		<version>4.0.1</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>br.com.bertolucci</groupId>
+	<groupId>io.github.ronaldobertolucci</groupId>
 	<artifactId>mygames</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>MyGames</name>
