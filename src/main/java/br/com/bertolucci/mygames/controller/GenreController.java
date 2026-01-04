@@ -22,8 +22,8 @@ public class GenreController {
 
     @GetMapping
     public ResponseEntity list(@PageableDefault(size = 20, sort = {"name"}) Pageable pagination) {
-        Page<GenreDto> companies = service.findAll(pagination);
-        return ResponseEntity.ok(companies);
+        Page<GenreDto> genres = service.findAll(pagination);
+        return ResponseEntity.ok(genres);
     }
 
     @GetMapping("/{id}")
@@ -36,7 +36,7 @@ public class GenreController {
     @PostMapping
     public ResponseEntity save(@RequestBody @Valid SaveGenreDto data, UriComponentsBuilder builder) {
         GenreDto dto = service.save(data);
-        var uri = builder.path("/companies/{id}").buildAndExpand(dto.id()).toUri();
+        var uri = builder.path("/genres/{id}").buildAndExpand(dto.id()).toUri();
         return ResponseEntity.created(uri).body(dto);
     }
 
