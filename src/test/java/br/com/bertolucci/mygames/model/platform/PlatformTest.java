@@ -100,7 +100,7 @@ class PlatformTest {
     }
 
     @Test
-    void deveSalvarCompanhiaComNome() {
+    void deveSalvarPlataformaComNome() {
         // given
         var store = new Store();
         store.setName("Store name");
@@ -118,7 +118,7 @@ class PlatformTest {
     }
 
     @Test
-    void deveAtualizarCompanhiaComNome() {
+    void deveAtualizarPlataformaComNome() {
         // given
         var store1 = new Store();
         store1.setName("Store name");

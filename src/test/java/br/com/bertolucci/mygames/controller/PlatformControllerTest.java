@@ -39,7 +39,7 @@ class PlatformControllerTest {
     private PlatformService platformService;
 
     @Test
-    void deveListarTodasAsCompanhias() throws Exception {
+    void deveListarTodasAsPlataformas() throws Exception {
         var store = new Store();
         store.setId(1L);
         store.setName("Store Name");
@@ -60,7 +60,7 @@ class PlatformControllerTest {
     }
 
     @Test
-    void deveDetalharCompanhia() throws Exception {
+    void deveDetalharPlataforma() throws Exception {
         when(platformService.detail(1L)).thenReturn(new PlatformDto(1L, "platform name", new StoreDto(1L, "store name")));
 
         mockMvc.perform(get("/platforms/{id}", 1L))
@@ -71,7 +71,7 @@ class PlatformControllerTest {
     }
 
     @Test
-    void deveFalharQuandoNaoEncontrarCompanhiaNoDetalhamento() throws Exception {
+    void deveFalharQuandoNaoEncontrarPlataformaNoDetalhamento() throws Exception {
         when(platformService.detail(1L)).thenThrow(EntityNotFoundException.class);
 
         mockMvc.perform(get("/platforms/{id}", 1L))
@@ -173,13 +173,13 @@ class PlatformControllerTest {
     }
 
     @Test
-    void deveDeletarCompanhia() throws Exception {
+    void deveDeletarPlataforma() throws Exception {
         mockMvc.perform(delete("/platforms/{id}", 1L))
                 .andExpect(status().isNoContent());
     }
 
     @Test
-    void deveFalharQuandoNaoEncontrarCompanhiaNaDelecao() throws Exception {
+    void deveFalharQuandoNaoEncontrarPlataformaNaDelecao() throws Exception {
         doThrow(new ObjectRetrievalFailureException(Platform.class, 1L))
                 .when(platformService).delete(1L);
 

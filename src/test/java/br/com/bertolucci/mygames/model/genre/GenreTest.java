@@ -21,7 +21,7 @@ class GenreTest {
     private GenreRepository repository;
 
     @Test
-    void deveSalvarCompanhiaComNome() {
+    void deveSalvarGeneroComNome() {
         // given
         var genre = new Genre();
         genre.setName("Genre name ");
@@ -33,7 +33,7 @@ class GenreTest {
     }
 
     @Test
-    void deveAtualizarCompanhiaComNome() {
+    void deveAtualizarGeneroComNome() {
         // given
         var genre = new Genre();
         genre.setName("Genre name ");

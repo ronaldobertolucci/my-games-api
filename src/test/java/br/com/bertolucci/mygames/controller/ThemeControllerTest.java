@@ -37,7 +37,7 @@ class ThemeControllerTest {
     private ThemeService themeService;
 
     @Test
-    void deveListarTodasAsCompanhias() throws Exception {
+    void deveListarTodasOsTemas() throws Exception {
         Page<Theme> themes = new PageImpl<>(
                 List.of(new Theme(new SaveThemeDto("Theme Name"))),
                 PageRequest.of(0,20),
@@ -50,7 +50,7 @@ class ThemeControllerTest {
     }
 
     @Test
-    void deveDetalharCompanhia() throws Exception {
+    void deveDetalharTema() throws Exception {
         when(themeService.detail(1L)).thenReturn(new ThemeDto(1L, "theme name"));
 
         mockMvc.perform(get("/themes/{id}", 1L))
@@ -59,7 +59,7 @@ class ThemeControllerTest {
     }
 
     @Test
-    void deveFalharQuandoNaoEncontrarCompanhiaNoDetalhamento() throws Exception {
+    void deveFalharQuandoNaoEncontrarTemaNoDetalhamento() throws Exception {
         when(themeService.detail(1L)).thenThrow(EntityNotFoundException.class);
 
         mockMvc.perform(get("/themes/{id}", 1L))
@@ -128,13 +128,13 @@ class ThemeControllerTest {
     }
 
     @Test
-    void deveDeletarCompanhia() throws Exception {
+    void deveDeletarTema() throws Exception {
         mockMvc.perform(delete("/themes/{id}", 1L))
                 .andExpect(status().isNoContent());
     }
 
     @Test
-    void deveFalharQuandoNaoEncontrarCompanhiaNaDelecao() throws Exception {
+    void deveFalharQuandoNaoEncontrarTemaNaDelecao() throws Exception {
         doThrow(new ObjectRetrievalFailureException(Theme.class, 1L))
                 .when(themeService).delete(1L);
 

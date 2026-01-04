@@ -37,7 +37,7 @@ class GenreControllerTest {
     private GenreService genreService;
 
     @Test
-    void deveListarTodasAsCompanhias() throws Exception {
+    void deveListarTodasOsGeneros() throws Exception {
         Page<Genre> genres = new PageImpl<>(
                 List.of(new Genre(new SaveGenreDto("Genre Name"))),
                 PageRequest.of(0,20),
@@ -50,7 +50,7 @@ class GenreControllerTest {
     }
 
     @Test
-    void deveDetalharCompanhia() throws Exception {
+    void deveDetalharGenero() throws Exception {
         when(genreService.detail(1L)).thenReturn(new GenreDto(1L, "genre name"));
 
         mockMvc.perform(get("/genres/{id}", 1L))
@@ -59,7 +59,7 @@ class GenreControllerTest {
     }
 
     @Test
-    void deveFalharQuandoNaoEncontrarCompanhiaNoDetalhamento() throws Exception {
+    void deveFalharQuandoNaoEncontrarGeneroNoDetalhamento() throws Exception {
         when(genreService.detail(1L)).thenThrow(EntityNotFoundException.class);
 
         mockMvc.perform(get("/genres/{id}", 1L))
@@ -128,13 +128,13 @@ class GenreControllerTest {
     }
 
     @Test
-    void deveDeletarCompanhia() throws Exception {
+    void deveDeletarGenero() throws Exception {
         mockMvc.perform(delete("/genres/{id}", 1L))
                 .andExpect(status().isNoContent());
     }
 
     @Test
-    void deveFalharQuandoNaoEncontrarCompanhiaNaDelecao() throws Exception {
+    void deveFalharQuandoNaoEncontrarGeneroNaDelecao() throws Exception {
         doThrow(new ObjectRetrievalFailureException(Genre.class, 1L))
                 .when(genreService).delete(1L);
 

@@ -21,7 +21,7 @@ class ThemeTest {
     private ThemeRepository repository;
 
     @Test
-    void deveSalvarCompanhiaComNome() {
+    void deveSalvarTemaComNome() {
         // given
         var theme = new Theme();
         theme.setName("Theme name ");
@@ -33,7 +33,7 @@ class ThemeTest {
     }
 
     @Test
-    void deveAtualizarCompanhiaComNome() {
+    void deveAtualizarTemaComNome() {
         // given
         var theme = new Theme();
         theme.setName("Theme name ");

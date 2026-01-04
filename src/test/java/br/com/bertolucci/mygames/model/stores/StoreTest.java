@@ -24,7 +24,7 @@ class StoreTest {
     private StoreRepository repository;
 
     @Test
-    void deveSalvarCompanhiaComNome() {
+    void deveSalvarLojaComNome() {
         // given
         var store = new Store();
         store.setName("Store name ");
@@ -36,7 +36,7 @@ class StoreTest {
     }
 
     @Test
-    void deveAtualizarCompanhiaComNome() {
+    void deveAtualizarLojaComNome() {
         // given
         var store = new Store();
         store.setName("Store name ");

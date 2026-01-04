@@ -37,7 +37,7 @@ class StoreControllerTest {
     private StoreService storeService;
 
     @Test
-    void deveListarTodasAsCompanhias() throws Exception {
+    void deveListarTodasAsLojas() throws Exception {
         Page<Store> stores = new PageImpl<>(
                 List.of(new Store(new SaveStoreDto("Store Name"))),
                 PageRequest.of(0,20),
@@ -50,7 +50,7 @@ class StoreControllerTest {
     }
 
     @Test
-    void deveDetalharCompanhia() throws Exception {
+    void deveDetalharLoja() throws Exception {
         when(storeService.detail(1L)).thenReturn(new StoreDto(1L, "store name"));
 
         mockMvc.perform(get("/stores/{id}", 1L))
@@ -59,7 +59,7 @@ class StoreControllerTest {
     }
 
     @Test
-    void deveFalharQuandoNaoEncontrarCompanhiaNoDetalhamento() throws Exception {
+    void deveFalharQuandoNaoEncontrarLojaNoDetalhamento() throws Exception {
         when(storeService.detail(1L)).thenThrow(EntityNotFoundException.class);
 
         mockMvc.perform(get("/stores/{id}", 1L))
@@ -128,13 +128,13 @@ class StoreControllerTest {
     }
 
     @Test
-    void deveDeletarCompanhia() throws Exception {
+    void deveDeletarLoja() throws Exception {
         mockMvc.perform(delete("/stores/{id}", 1L))
                 .andExpect(status().isNoContent());
     }
 
     @Test
-    void deveFalharQuandoNaoEncontrarCompanhiaNaDelecao() throws Exception {
+    void deveFalharQuandoNaoEncontrarLojaNaDelecao() throws Exception {
         doThrow(new ObjectRetrievalFailureException(Store.class, 1L))
                 .when(storeService).delete(1L);
 
