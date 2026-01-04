@@ -3,6 +3,8 @@ package br.com.bertolucci.mygames.controller;
 import br.com.bertolucci.mygames.model.platform.Platform;
 import br.com.bertolucci.mygames.model.platform.PlatformDto;
 import br.com.bertolucci.mygames.model.platform.SavePlatformDto;
+import br.com.bertolucci.mygames.model.store.Store;
+import br.com.bertolucci.mygames.model.store.StoreDto;
 import br.com.bertolucci.mygames.service.platform.PlatformService;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
@@ -38,24 +40,34 @@ class PlatformControllerTest {
 
     @Test
     void deveListarTodasAsCompanhias() throws Exception {
+        var store = new Store();
+        store.setId(1L);
+        store.setName("Store Name");
+        var platform = new Platform(new SavePlatformDto("Platform Name", 1L));
+        platform.setStore(store);
+
         Page<Platform> platforms = new PageImpl<>(
-                List.of(new Platform(new SavePlatformDto("Platform Name"))),
+                List.of(platform),
                 PageRequest.of(0,20),
                 1);
         when(platformService.findAll(any())).thenReturn(platforms.map(PlatformDto::new));
 
         mockMvc.perform(get("/platforms"))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[0].name").value("platform name"));
+                .andExpect(jsonPath("$.content[0].name").value("platform name"))
+                .andExpect(jsonPath("$.content[0].store.id").value(1L))
+                .andExpect(jsonPath("$.content[0].store.name").value("store name"));
     }
 
     @Test
     void deveDetalharCompanhia() throws Exception {
-        when(platformService.detail(1L)).thenReturn(new PlatformDto(1L, "platform name"));
+        when(platformService.detail(1L)).thenReturn(new PlatformDto(1L, "platform name", new StoreDto(1L, "store name")));
 
         mockMvc.perform(get("/platforms/{id}", 1L))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("platform name"));
+                .andExpect(jsonPath("$.name").value("platform name"))
+                .andExpect(jsonPath("$.store.id").value(1L))
+                .andExpect(jsonPath("$.store.name").value("store name"));
     }
 
     @Test
@@ -71,7 +83,8 @@ class PlatformControllerTest {
     void deveFalharQuandoNomeInvalidoNaCriacao(String name) throws Exception {
         String requestBody = """
             {
-                "name": "%s"
+                "name": "%s",
+                "store_id": 1
             }
             """.formatted(name);
 
@@ -82,14 +95,29 @@ class PlatformControllerTest {
     }
 
     @Test
-    void deveCriarQuandoNomeValidoNaCriacao() throws Exception {
+    void deveFalharQuandoIdStoreNuloNaCriacao() throws Exception {
         String requestBody = """
             {
                 "name": "Platform name"
             }
             """;
 
-        when(platformService.save(any())).thenReturn(new PlatformDto(1L,"platform name"));
+        mockMvc.perform(post("/platforms")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void deveCriarQuandoValidoNaCriacao() throws Exception {
+        String requestBody = """
+            {
+                "name": "Platform name",
+                "store_id": 1
+            }
+            """;
+
+        when(platformService.save(any())).thenReturn(new PlatformDto(1L,"platform name", new StoreDto(1L, "store name")));
 
         mockMvc.perform(post("/platforms")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -103,9 +131,25 @@ class PlatformControllerTest {
         String requestBody = """
             {
                 "id": 1,
-                "name": "%s"
+                "name": "%s",
+                "store_id": 1
             }
             """.formatted(name);
+
+        mockMvc.perform(put("/platforms")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void deveFalharQuandoIdStoreNuloNaAtualizacao() throws Exception {
+        String requestBody = """
+            {
+                "id": 1,
+                "name": "%s"
+            }
+            """;
 
         mockMvc.perform(put("/platforms")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -117,7 +161,8 @@ class PlatformControllerTest {
     void deveFalharQuandoIdNuloNaAtualizacao() throws Exception {
         String requestBody = """
             {
-                "name": "Platform Name"
+                "name": "Platform Name",
+                "store_id": 1
             }
             """;
 

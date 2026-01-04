@@ -1,5 +1,6 @@
 package br.com.bertolucci.mygames.model.platform;
 
+import br.com.bertolucci.mygames.model.store.Store;
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
@@ -11,19 +12,33 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
-@EqualsAndHashCode(of = "name")
+@EqualsAndHashCode(of = {"name", "store"})
 public class Platform {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "store_id")
+    private Store store;
+
     public Platform(SavePlatformDto dto) {
         this.name = normalizeName(dto.name());
     }
 
+    public Platform(String name, Store store) {
+        this.name = normalizeName(name);
+        this.store = store;
+    }
+
     public void update(UpdatePlatformDto dto) {
         this.name = normalizeName(dto.name());
+    }
+
+    public void update(String name, Store store) {
+        this.name = normalizeName(name);
+        this.store = store;
     }
 
     public void setName(String name) {

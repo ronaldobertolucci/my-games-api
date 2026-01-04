@@ -1,6 +1,8 @@
 package br.com.bertolucci.mygames.service.platform;
 
 import br.com.bertolucci.mygames.model.platform.*;
+import br.com.bertolucci.mygames.model.store.Store;
+import br.com.bertolucci.mygames.model.store.StoreRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -11,36 +13,43 @@ import org.springframework.transaction.annotation.Transactional;
 public class PlatformService {
 
     @Autowired
-    private PlatformRepository repository;
+    private PlatformRepository platformRepository;
+
+    @Autowired
+    private StoreRepository storeRepository;
 
     public Page<PlatformDto> findAll(Pageable pageable) {
-        Page<Platform> platforms = repository.findAll(pageable);
+        Page<Platform> platforms = platformRepository.findAll(pageable);
         return platforms.map(PlatformDto::new);
     }
 
     public PlatformDto detail(Long id) {
-        Platform platform = repository.getReferenceById(id);
+        Platform platform = platformRepository.getReferenceById(id);
         return new PlatformDto(platform);
     }
 
     @Transactional
     public PlatformDto save(SavePlatformDto dto) {
-        Platform platform = new Platform(dto);
-        repository.save(platform);
+        Store store = storeRepository.getReferenceById(dto.storeId());
+
+        Platform platform = new Platform(dto.name(), store);
+        platformRepository.save(platform);
         return new PlatformDto(platform);
     }
 
     @Transactional
     public PlatformDto update(UpdatePlatformDto dto) {
-        Platform platform = repository.getReferenceById(dto.id());
-        platform.update(dto);
+        Store store = storeRepository.getReferenceById(dto.storeId());
+
+        Platform platform = platformRepository.getReferenceById(dto.id());
+        platform.update(dto.name(), store);
         return new PlatformDto(platform);
     }
 
     @Transactional
     public void delete(Long id) {
-        Platform platform = repository.getReferenceById(id);
-        repository.delete(platform);
+        Platform platform = platformRepository.getReferenceById(id);
+        platformRepository.delete(platform);
     }
 
 }
