@@ -1,8 +1,7 @@
 package br.com.bertolucci.mygames.model.platform;
 
-import br.com.bertolucci.mygames.model.platform.SavePlatformDto;
-import br.com.bertolucci.mygames.model.platform.UpdatePlatformDto;
 import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,6 +11,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+@EqualsAndHashCode(of = "name")
 public class Platform {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

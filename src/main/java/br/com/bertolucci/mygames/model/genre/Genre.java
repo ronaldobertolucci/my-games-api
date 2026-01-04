@@ -1,8 +1,7 @@
 package br.com.bertolucci.mygames.model.genre;
 
-import br.com.bertolucci.mygames.model.company.SaveCompanyDto;
-import br.com.bertolucci.mygames.model.company.UpdateCompanyDto;
 import jakarta.persistence.*;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -12,6 +11,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @NoArgsConstructor
+@EqualsAndHashCode(of = "name")
 public class Genre {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
