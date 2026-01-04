@@ -52,13 +52,13 @@ public class GameController {
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/{id}/generos/{genreId}")
+    @PostMapping("/{id}/genres/{genreId}")
     public ResponseEntity addGenre(@PathVariable Long id, @PathVariable Long genreId) {
         GameDto dto = service.addGenre(id, genreId);
         return ResponseEntity.ok(dto);
     }
 
-    @DeleteMapping("/{id}/generos/{genreId}")
+    @DeleteMapping("/{id}/genres/{genreId}")
     public ResponseEntity removeGenre(@PathVariable Long id, @PathVariable Long genreId) {
         GameDto dto = service.removeGenre(id, genreId);
         return ResponseEntity.ok(dto);
