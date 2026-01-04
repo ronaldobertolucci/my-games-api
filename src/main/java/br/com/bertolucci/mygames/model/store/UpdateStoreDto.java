@@ -1,0 +1,12 @@
+package br.com.bertolucci.mygames.model.store;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+
+public record UpdateStoreDto(
+        @NotNull(message = "id é obrigatório")
+        Long id,
+        @NotBlank(message = "Nome é obrigatório")
+        String name
+) {
+}
