@@ -2,6 +2,7 @@ package io.github.ronaldobertolucci.mygames.model.game;
 
 import io.github.ronaldobertolucci.mygames.model.company.Company;
 import io.github.ronaldobertolucci.mygames.model.genre.Genre;
+import io.github.ronaldobertolucci.mygames.model.theme.Theme;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
@@ -37,6 +38,14 @@ public class Game {
             inverseJoinColumns = @JoinColumn(name = "genre_id")
     )
     private Set<Genre> genres = new HashSet<>();
+
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+            name = "game_theme",
+            joinColumns = @JoinColumn(name = "game_id"),
+            inverseJoinColumns = @JoinColumn(name = "theme_id")
+    )
+    private Set<Theme> themes = new HashSet<>();
 
     public void setTitle(String title) {
         this.title = title.toLowerCase().trim();

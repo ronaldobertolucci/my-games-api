@@ -63,4 +63,16 @@ public class GameController {
         GameDto dto = service.removeGenre(id, genreId);
         return ResponseEntity.ok(dto);
     }
+
+    @PostMapping("/{id}/themes/{themeId}")
+    public ResponseEntity addTheme(@PathVariable Long id, @PathVariable Long themeId) {
+        GameDto dto = service.addTheme(id, themeId);
+        return ResponseEntity.ok(dto);
+    }
+
+    @DeleteMapping("/{id}/themes/{themeId}")
+    public ResponseEntity removeTheme(@PathVariable Long id, @PathVariable Long themeId) {
+        GameDto dto = service.removeTheme(id, themeId);
+        return ResponseEntity.ok(dto);
+    }
 }

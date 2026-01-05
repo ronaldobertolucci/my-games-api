@@ -16,6 +16,7 @@ public record SaveGameDto(
         LocalDate releasedAt,
         @NotNull(message = "id da companhia é obrigatório")
         Long companyId,
-        List<Long> genreIds
+        List<Long> genreIds,
+        List<Long> themeIds
 ) {
 }

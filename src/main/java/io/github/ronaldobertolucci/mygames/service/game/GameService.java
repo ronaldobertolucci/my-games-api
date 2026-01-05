@@ -1,18 +1,24 @@
 package io.github.ronaldobertolucci.mygames.service.game;
 
+import io.github.ronaldobertolucci.mygames.infra.exception.UnprocessableEntity;
 import io.github.ronaldobertolucci.mygames.model.company.Company;
 import io.github.ronaldobertolucci.mygames.model.company.CompanyRepository;
 import io.github.ronaldobertolucci.mygames.model.game.*;
 import io.github.ronaldobertolucci.mygames.model.game.*;
 import io.github.ronaldobertolucci.mygames.model.genre.Genre;
 import io.github.ronaldobertolucci.mygames.model.genre.GenreRepository;
+import io.github.ronaldobertolucci.mygames.model.theme.Theme;
+import io.github.ronaldobertolucci.mygames.model.theme.ThemeRepository;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 @Service
@@ -26,6 +32,9 @@ public class GameService {
 
     @Autowired
     private GenreRepository genreRepository;
+
+    @Autowired
+    private ThemeRepository themeRepository;
 
     public Page<GameDto> findAll(Pageable pageable) {
         Page<Game> games = gameRepository.findAll(pageable);
@@ -44,15 +53,10 @@ public class GameService {
         game.setDescription(dto.description());
         game.setReleasedAt(dto.releasedAt());
 
-        Company company = companyRepository.getReferenceById(dto.companyId());
-        game.setCompany(company);
+        setCompany(dto.companyId(), game);
+        setGenres(dto.genreIds(), game);
+        setThemes(dto.themeIds(), game);
 
-        Set<Genre> genres = new HashSet<>();
-        for (Long genreId : dto.genreIds()) {
-            Genre genre = genreRepository.getReferenceById(genreId);
-            genres.add(genre);
-        }
-        game.setGenres(genres);
         gameRepository.save(game);
 
         return new GameDto(game);
@@ -65,15 +69,10 @@ public class GameService {
         game.setDescription(dto.description());
         game.setReleasedAt(dto.releasedAt());
 
-        Company company = companyRepository.getReferenceById(dto.companyId());
-        game.setCompany(company);
+        setCompany(dto.companyId(), game);
+        setGenres(dto.genreIds(), game);
+        setThemes(dto.themeIds(), game);
 
-        Set<Genre> genres = new HashSet<>();
-        for (Long genreId : dto.genreIds()) {
-            Genre genre = genreRepository.getReferenceById(genreId);
-            genres.add(genre);
-        }
-        game.setGenres(genres);
         return new GameDto(game);
     }
 
@@ -97,6 +96,57 @@ public class GameService {
         Genre genre = genreRepository.getReferenceById(genreId);
         game.getGenres().remove(genre);
         return new GameDto(game);
+    }
+
+    @Transactional
+    public GameDto addTheme(Long gameId, Long themeId) {
+        Game game = gameRepository.getReferenceById(gameId);
+        Theme theme = themeRepository.getReferenceById(themeId);
+        game.getThemes().add(theme);
+        return new GameDto(game);
+    }
+
+    @Transactional
+    public GameDto removeTheme(Long gameId, Long themeId) {
+        Game game = gameRepository.getReferenceById(gameId);
+        Theme theme = themeRepository.getReferenceById(themeId);
+        game.getThemes().remove(theme);
+        return new GameDto(game);
+    }
+
+    private void setThemes(List<Long> themeIds, Game game) {
+        try {
+            Set<Theme> themes = new HashSet<>();
+            for (Long themeId : themeIds) {
+                Theme theme = themeRepository.getReferenceById(themeId);
+                themes.add(theme);
+            }
+            game.setThemes(themes);
+        } catch (EntityNotFoundException ex) {
+            throw new UnprocessableEntity("One or more referenced resources do not exist");
+        }
+    }
+
+    private void setGenres(List<Long> genreIds, Game game) {
+        try {
+            Set<Genre> genres = new HashSet<>();
+            for (Long genreId : genreIds) {
+                Genre genre = genreRepository.getReferenceById(genreId);
+                genres.add(genre);
+            }
+            game.setGenres(genres);
+        } catch (EntityNotFoundException ex) {
+            throw new UnprocessableEntity("One or more referenced resources do not exist");
+        }
+    }
+
+    private void setCompany(Long companyId, Game game) {
+        try {
+            Company company = companyRepository.getReferenceById(companyId);
+            game.setCompany(company);
+        } catch (EntityNotFoundException ex) {
+            throw new UnprocessableEntity("One or more referenced resources do not exist");
+        }
     }
 
 }

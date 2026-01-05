@@ -5,6 +5,7 @@ import io.github.ronaldobertolucci.mygames.model.company.CompanyDto;
 import io.github.ronaldobertolucci.mygames.model.game.Game;
 import io.github.ronaldobertolucci.mygames.model.game.GameDto;
 import io.github.ronaldobertolucci.mygames.model.genre.Genre;
+import io.github.ronaldobertolucci.mygames.model.theme.Theme;
 import io.github.ronaldobertolucci.mygames.service.game.GameService;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
@@ -72,7 +73,7 @@ class GameControllerTest {
 
     @Test
     void deveDetalharJogo() throws Exception {
-        when(gameService.detail(1L)).thenReturn(new GameDto(1L, "game title", "game description", LocalDate.parse("2026-02-01"), new CompanyDto(1L, "company name"), new ArrayList<>()));
+        when(gameService.detail(1L)).thenReturn(new GameDto(1L, "game title", "game description", LocalDate.parse("2026-02-01"), new CompanyDto(1L, "company name"), new ArrayList<>(), new ArrayList<>()));
 
         mockMvc.perform(get("/games/{id}", 1L))
                 .andExpect(status().isOk())
@@ -133,7 +134,7 @@ class GameControllerTest {
             }
             """;
 
-        when(gameService.save(any())).thenReturn(new GameDto(1L, "game title", "game description", LocalDate.parse("2026-02-01"), new CompanyDto(1L, "company name"), new ArrayList<>()));
+        when(gameService.save(any())).thenReturn(new GameDto(1L, "game title", "game description", LocalDate.parse("2026-02-01"), new CompanyDto(1L, "company name"), new ArrayList<>(), new ArrayList<>()));
 
         mockMvc.perform(post("/games")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -218,6 +219,24 @@ class GameControllerTest {
                 .when(gameService).addGenre(1L, 1L);
 
         mockMvc.perform(post("/games/{id}/genres/{genreId}", 1L, 1L))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void deveFalharQuandoNaoEncontrarTemaNaDelecao() throws Exception {
+        doThrow(new ObjectRetrievalFailureException(Theme.class, 1L))
+                .when(gameService).removeTheme(1L, 1L);
+
+        mockMvc.perform(delete("/games/{id}/themes/{themeId}", 1L, 1L))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void deveFalharQuandoNaoEncontrarTemaNaAdicao() throws Exception {
+        doThrow(new ObjectRetrievalFailureException(Theme.class, 1L))
+                .when(gameService).addTheme(1L, 1L);
+
+        mockMvc.perform(post("/games/{id}/themes/{themeId}", 1L, 1L))
                 .andExpect(status().isNotFound());
     }
 }

@@ -2,9 +2,12 @@ package io.github.ronaldobertolucci.mygames.infra.exception;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.hibernate.TypeMismatchException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.orm.ObjectRetrievalFailureException;
 import org.springframework.orm.jpa.JpaObjectRetrievalFailureException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -26,9 +29,14 @@ public class MyGamesExceptionHandler {
         return ResponseEntity.notFound().build();
     }
 
-    @ExceptionHandler(org.springframework.orm.ObjectRetrievalFailureException.class)
+    @ExceptionHandler(ObjectRetrievalFailureException.class)
     public ResponseEntity handle404Hibernate() {
         return ResponseEntity.notFound().build();
+    }
+
+    @ExceptionHandler(UnprocessableEntity.class)
+    public ResponseEntity handle422(UnprocessableEntity ex) {
+        return ResponseEntity.status(422).body(ex.getMessage());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -58,14 +66,14 @@ public class MyGamesExceptionHandler {
     }
 
 
-    @ExceptionHandler(org.springframework.dao.DataIntegrityViolationException.class)
+    @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity handle409(org.springframework.dao.DataIntegrityViolationException ex) {
         return new ResponseEntity<>(ex.getMostSpecificCause().getMessage(),  HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(Exception.class)
-    public ResponseEntity handle500(Exception ex) {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Ocorreu um erro interno");
+    public ResponseEntity handle500() {
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error");
     }
 
     private record ErrorValidation(String field, String message) {
