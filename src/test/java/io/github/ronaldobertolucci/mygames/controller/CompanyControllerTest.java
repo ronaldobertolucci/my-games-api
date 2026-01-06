@@ -1,15 +1,19 @@
 package io.github.ronaldobertolucci.mygames.controller;
 
+import io.github.ronaldobertolucci.mygames.config.SecurityConfigurations;
 import io.github.ronaldobertolucci.mygames.model.company.Company;
 import io.github.ronaldobertolucci.mygames.model.company.CompanyDto;
 import io.github.ronaldobertolucci.mygames.model.company.SaveCompanyDto;
+import io.github.ronaldobertolucci.mygames.model.user.UserRepository;
 import io.github.ronaldobertolucci.mygames.service.company.CompanyService;
+import io.github.ronaldobertolucci.mygames.service.security.TokenService;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -23,21 +27,29 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(CompanyController.class)
+@Import({SecurityConfigurations.class})
 class CompanyControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @MockitoBean
+    private TokenService tokenService;
+
+    @MockitoBean
+    private UserRepository userRepository;
+
+    @MockitoBean
     private CompanyService companyService;
 
     @Test
-    void deveListarTodasAsCompanhias() throws Exception {
+    void deveProbirListarTodasAsCompanhiasParaNaoAutenticado() throws Exception {
         Page<Company> companies = new PageImpl<>(
                 List.of(new Company(new SaveCompanyDto("Company Name"))),
                 PageRequest.of(0,20),
@@ -45,15 +57,37 @@ class CompanyControllerTest {
         when(companyService.findAll(any())).thenReturn(companies.map(CompanyDto::new));
 
         mockMvc.perform(get("/companies"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void deveListarTodasAsCompanhiasParaAutenticado() throws Exception {
+        Page<Company> companies = new PageImpl<>(
+                List.of(new Company(new SaveCompanyDto("Company Name"))),
+                PageRequest.of(0,20),
+                1);
+        when(companyService.findAll(any())).thenReturn(companies.map(CompanyDto::new));
+
+        mockMvc.perform(get("/companies")
+                        .with(user("test").roles("USER", "ADMIN")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].name").value("company name"));
     }
 
     @Test
-    void deveDetalharCompanhia() throws Exception {
+    void deveProibirDetalharCompanhiaParaNaoAutenticado() throws Exception {
         when(companyService.detail(1L)).thenReturn(new CompanyDto(1L, "company name"));
 
         mockMvc.perform(get("/companies/{id}", 1L))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void deveDetalharCompanhiaParaAutenticado() throws Exception {
+        when(companyService.detail(1L)).thenReturn(new CompanyDto(1L, "company name"));
+
+        mockMvc.perform(get("/companies/{id}", 1L)
+                        .with(user("test").roles("USER", "ADMIN")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("company name"));
     }
@@ -62,7 +96,8 @@ class CompanyControllerTest {
     void deveFalharQuandoNaoEncontrarCompanhiaNoDetalhamento() throws Exception {
         when(companyService.detail(1L)).thenThrow(EntityNotFoundException.class);
 
-        mockMvc.perform(get("/companies/{id}", 1L))
+        mockMvc.perform(get("/companies/{id}", 1L)
+                        .with(user("test").roles("USER", "ADMIN")))
                 .andExpect(status().isNotFound());
     }
 
@@ -77,12 +112,13 @@ class CompanyControllerTest {
 
         mockMvc.perform(post("/companies")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
+                        .content(requestBody)
+                        .with(user("test").roles("USER", "ADMIN")))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    void deveCriarQuandoNomeValidoNaCriacao() throws Exception {
+    void deveProibirCriarQuandoNomeValidoNaCriacaoParaNaoAutenticado() throws Exception {
         String requestBody = """
             {
                 "name": "Company name"
@@ -94,6 +130,23 @@ class CompanyControllerTest {
         mockMvc.perform(post("/companies")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void deveCriarQuandoNomeValidoNaCriacaoParaAutenticado() throws Exception {
+        String requestBody = """
+            {
+                "name": "Company name"
+            }
+            """;
+
+        when(companyService.save(any())).thenReturn(new CompanyDto(1L,"company name"));
+
+        mockMvc.perform(post("/companies")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody)
+                        .with(user("test").roles("USER", "ADMIN")))
                 .andExpect(status().isCreated());
     }
 
@@ -109,8 +162,44 @@ class CompanyControllerTest {
 
         mockMvc.perform(put("/companies")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
+                        .content(requestBody)
+                        .with(user("test").roles("USER", "ADMIN")))
                 .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void deveProibirAtualizarQuandoNomeValidoParaNaoAutenticado() throws Exception {
+        String requestBody = """
+            {
+                "id": 1,
+                "name": "Company name"
+            }
+            """;
+
+        when(companyService.update(any())).thenReturn(new CompanyDto(1L,"company name"));
+
+        mockMvc.perform(put("/companies")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void deveAtualizarQuandoNomeValidoParaAutenticado() throws Exception {
+        String requestBody = """
+            {
+                "id": 1,
+                "name": "Company name"
+            }
+            """;
+
+        when(companyService.update(any())).thenReturn(new CompanyDto(1L,"company name"));
+
+        mockMvc.perform(put("/companies")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody)
+                        .with(user("test").roles("USER", "ADMIN")))
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -123,13 +212,21 @@ class CompanyControllerTest {
 
         mockMvc.perform(put("/companies")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
+                        .content(requestBody)
+                        .with(user("test").roles("USER", "ADMIN")))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    void deveDeletarCompanhia() throws Exception {
+    void deveProibirDeletarCompanhiaParaNaoAutenticado() throws Exception {
         mockMvc.perform(delete("/companies/{id}", 1L))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void deveDeletarCompanhiaParaAutenticado() throws Exception {
+        mockMvc.perform(delete("/companies/{id}", 1L)
+                        .with(user("test").roles("USER", "ADMIN")))
                 .andExpect(status().isNoContent());
     }
 
@@ -138,7 +235,8 @@ class CompanyControllerTest {
         doThrow(new ObjectRetrievalFailureException(Company.class, 1L))
                 .when(companyService).delete(1L);
 
-        mockMvc.perform(delete("/companies/{id}", 1L))
+        mockMvc.perform(delete("/companies/{id}", 1L)
+                        .with(user("test").roles("USER", "ADMIN")))
                 .andExpect(status().isNotFound());
     }
 }

@@ -1,17 +1,19 @@
 package io.github.ronaldobertolucci.mygames.controller;
 
+import io.github.ronaldobertolucci.mygames.config.SecurityConfigurations;
 import io.github.ronaldobertolucci.mygames.model.platform.Platform;
 import io.github.ronaldobertolucci.mygames.model.platform.PlatformDto;
 import io.github.ronaldobertolucci.mygames.model.platform.SavePlatformDto;
-import io.github.ronaldobertolucci.mygames.model.store.Store;
-import io.github.ronaldobertolucci.mygames.model.store.StoreDto;
+import io.github.ronaldobertolucci.mygames.model.user.UserRepository;
 import io.github.ronaldobertolucci.mygames.service.platform.PlatformService;
+import io.github.ronaldobertolucci.mygames.service.security.TokenService;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -25,21 +27,29 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(PlatformController.class)
+@Import({SecurityConfigurations.class})
 class PlatformControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @MockitoBean
+    private TokenService tokenService;
+
+    @MockitoBean
+    private UserRepository userRepository;
+
+    @MockitoBean
     private PlatformService platformService;
 
     @Test
-    void deveListarTodasAsPlataformas() throws Exception {
+    void deveProibirListarTodasAsPlataformasParaNaoAutenticado() throws Exception {
         Page<Platform> platforms = new PageImpl<>(
                 List.of(new Platform(new SavePlatformDto("Platform Name"))),
                 PageRequest.of(0,20),
@@ -47,15 +57,37 @@ class PlatformControllerTest {
         when(platformService.findAll(any())).thenReturn(platforms.map(PlatformDto::new));
 
         mockMvc.perform(get("/platforms"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void deveListarTodasAsPlataformasParaAutenticado() throws Exception {
+        Page<Platform> platforms = new PageImpl<>(
+                List.of(new Platform(new SavePlatformDto("Platform Name"))),
+                PageRequest.of(0,20),
+                1);
+        when(platformService.findAll(any())).thenReturn(platforms.map(PlatformDto::new));
+
+        mockMvc.perform(get("/platforms")
+                        .with(user("test").roles("USER", "ADMIN")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].name").value("platform name"));
     }
 
     @Test
-    void deveDetalharPlataforma() throws Exception {
+    void deveDetalharPlataformaParaNaoAutenticado() throws Exception {
         when(platformService.detail(1L)).thenReturn(new PlatformDto(1L, "platform name" ));
 
         mockMvc.perform(get("/platforms/{id}", 1L))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void deveDetalharPlataformaParaAutenticado() throws Exception {
+        when(platformService.detail(1L)).thenReturn(new PlatformDto(1L, "platform name" ));
+
+        mockMvc.perform(get("/platforms/{id}", 1L)
+                        .with(user("test").roles("USER", "ADMIN")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("platform name"));
     }
@@ -64,7 +96,8 @@ class PlatformControllerTest {
     void deveFalharQuandoNaoEncontrarPlataformaNoDetalhamento() throws Exception {
         when(platformService.detail(1L)).thenThrow(EntityNotFoundException.class);
 
-        mockMvc.perform(get("/platforms/{id}", 1L))
+        mockMvc.perform(get("/platforms/{id}", 1L)
+                        .with(user("test").roles("USER", "ADMIN")))
                 .andExpect(status().isNotFound());
     }
 
@@ -79,12 +112,13 @@ class PlatformControllerTest {
 
         mockMvc.perform(post("/platforms")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
+                        .content(requestBody)
+                        .with(user("test").roles("USER", "ADMIN")))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    void deveCriarQuandoValidoNaCriacao() throws Exception {
+    void deveProibirCriarQuandoValidoParaNaoAutenticado() throws Exception {
         String requestBody = """
             {
                 "name": "Platform name"
@@ -96,7 +130,59 @@ class PlatformControllerTest {
         mockMvc.perform(post("/platforms")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void deveCriarQuandoValidoParaAutenticado() throws Exception {
+        String requestBody = """
+            {
+                "name": "Platform name"
+            }
+            """;
+
+        when(platformService.save(any())).thenReturn(new PlatformDto(1L,"platform name"));
+
+        mockMvc.perform(post("/platforms")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody)
+                        .with(user("test").roles("USER", "ADMIN")))
                 .andExpect(status().isCreated());
+    }
+
+    @Test
+    void deveProibirAtualizarQuandoValidoParaNaoAutenticado() throws Exception {
+        String requestBody = """
+            {
+                "id": 1,
+                "name": "Platform name"
+            }
+            """;
+
+        when(platformService.save(any())).thenReturn(new PlatformDto(1L,"platform name"));
+
+        mockMvc.perform(put("/platforms")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void deveAtualizarQuandoValidoParaAutenticado() throws Exception {
+        String requestBody = """
+            {
+                "id": 1,
+                "name": "Platform name"
+            }
+            """;
+
+        when(platformService.save(any())).thenReturn(new PlatformDto(1L,"platform name"));
+
+        mockMvc.perform(put("/platforms")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody)
+                        .with(user("test").roles("USER", "ADMIN")))
+                .andExpect(status().isOk());
     }
 
     @ParameterizedTest
@@ -111,7 +197,8 @@ class PlatformControllerTest {
 
         mockMvc.perform(put("/platforms")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
+                        .content(requestBody)
+                        .with(user("test").roles("USER", "ADMIN")))
                 .andExpect(status().isBadRequest());
     }
 
@@ -125,13 +212,21 @@ class PlatformControllerTest {
 
         mockMvc.perform(put("/platforms")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
+                        .content(requestBody)
+                        .with(user("test").roles("USER", "ADMIN")))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    void deveDeletarPlataforma() throws Exception {
+    void deveProibirDeletarPlataformaParaNaoAutenticado() throws Exception {
         mockMvc.perform(delete("/platforms/{id}", 1L))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void deveDeletarPlataformaParaAutenticado() throws Exception {
+        mockMvc.perform(delete("/platforms/{id}", 1L)
+                        .with(user("test").roles("USER", "ADMIN")))
                 .andExpect(status().isNoContent());
     }
 
@@ -140,7 +235,8 @@ class PlatformControllerTest {
         doThrow(new ObjectRetrievalFailureException(Platform.class, 1L))
                 .when(platformService).delete(1L);
 
-        mockMvc.perform(delete("/platforms/{id}", 1L))
+        mockMvc.perform(delete("/platforms/{id}", 1L)
+                        .with(user("test").roles("USER", "ADMIN")))
                 .andExpect(status().isNotFound());
     }
 }

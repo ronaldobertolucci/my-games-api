@@ -1,8 +1,11 @@
 package io.github.ronaldobertolucci.mygames.controller;
 
+import io.github.ronaldobertolucci.mygames.config.SecurityConfigurations;
 import io.github.ronaldobertolucci.mygames.model.theme.Theme;
 import io.github.ronaldobertolucci.mygames.model.theme.ThemeDto;
 import io.github.ronaldobertolucci.mygames.model.theme.SaveThemeDto;
+import io.github.ronaldobertolucci.mygames.model.user.UserRepository;
+import io.github.ronaldobertolucci.mygames.service.security.TokenService;
 import io.github.ronaldobertolucci.mygames.service.theme.ThemeService;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
@@ -10,6 +13,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
@@ -23,21 +27,29 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.user;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(ThemeController.class)
+@Import({SecurityConfigurations.class})
 class ThemeControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
 
     @MockitoBean
+    private TokenService tokenService;
+
+    @MockitoBean
+    private UserRepository userRepository;
+
+    @MockitoBean
     private ThemeService themeService;
 
     @Test
-    void deveListarTodasOsTemas() throws Exception {
+    void deveProibirListarTodosOsTemasParaNaoAutenticado() throws Exception {
         Page<Theme> themes = new PageImpl<>(
                 List.of(new Theme(new SaveThemeDto("Theme Name"))),
                 PageRequest.of(0,20),
@@ -45,15 +57,38 @@ class ThemeControllerTest {
         when(themeService.findAll(any())).thenReturn(themes.map(ThemeDto::new));
 
         mockMvc.perform(get("/themes"))
+                .andExpect(status().isForbidden());
+    }
+
+
+    @Test
+    void deveListarTodosOsTemasParaAutenticado() throws Exception {
+        Page<Theme> themes = new PageImpl<>(
+                List.of(new Theme(new SaveThemeDto("Theme Name"))),
+                PageRequest.of(0,20),
+                1);
+        when(themeService.findAll(any())).thenReturn(themes.map(ThemeDto::new));
+
+        mockMvc.perform(get("/themes")
+                        .with(user("test").roles("USER", "ADMIN")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].name").value("theme name"));
     }
 
     @Test
-    void deveDetalharTema() throws Exception {
+    void deveProibirDetalharTemaParaNaoAutenticado() throws Exception {
         when(themeService.detail(1L)).thenReturn(new ThemeDto(1L, "theme name"));
 
         mockMvc.perform(get("/themes/{id}", 1L))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void deveDetalharTemaParaAutenticado() throws Exception {
+        when(themeService.detail(1L)).thenReturn(new ThemeDto(1L, "theme name"));
+
+        mockMvc.perform(get("/themes/{id}", 1L)
+                        .with(user("test").roles("USER", "ADMIN")))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.name").value("theme name"));
     }
@@ -62,7 +97,8 @@ class ThemeControllerTest {
     void deveFalharQuandoNaoEncontrarTemaNoDetalhamento() throws Exception {
         when(themeService.detail(1L)).thenThrow(EntityNotFoundException.class);
 
-        mockMvc.perform(get("/themes/{id}", 1L))
+        mockMvc.perform(get("/themes/{id}", 1L)
+                        .with(user("test").roles("USER", "ADMIN")))
                 .andExpect(status().isNotFound());
     }
 
@@ -77,12 +113,13 @@ class ThemeControllerTest {
 
         mockMvc.perform(post("/themes")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
+                        .content(requestBody)
+                        .with(user("test").roles("USER", "ADMIN")))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    void deveCriarQuandoNomeValidoNaCriacao() throws Exception {
+    void deveProibirCriarQuandoNomeValidoParaNaoAutenticado() throws Exception {
         String requestBody = """
             {
                 "name": "Theme name"
@@ -94,7 +131,59 @@ class ThemeControllerTest {
         mockMvc.perform(post("/themes")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void deveCriarQuandoNomeValidoParaAutenticado() throws Exception {
+        String requestBody = """
+            {
+                "name": "Theme name"
+            }
+            """;
+
+        when(themeService.save(any())).thenReturn(new ThemeDto(1L,"theme name"));
+
+        mockMvc.perform(post("/themes")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody)
+                        .with(user("test").roles("USER", "ADMIN")))
                 .andExpect(status().isCreated());
+    }
+
+    @Test
+    void deveProibirAtualizarQuandoNomeValidoParaNaoAutenticado() throws Exception {
+        String requestBody = """
+            {
+                "id": 1,
+                "name": "Theme name"
+            }
+            """;
+
+        when(themeService.save(any())).thenReturn(new ThemeDto(1L,"theme name"));
+
+        mockMvc.perform(put("/themes")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void deveAtualizarQuandoNomeValidoParaAutenticado() throws Exception {
+        String requestBody = """
+            {
+                "id": 1,
+                "name": "Theme name"
+            }
+            """;
+
+        when(themeService.save(any())).thenReturn(new ThemeDto(1L,"theme name"));
+
+        mockMvc.perform(put("/themes")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(requestBody)
+                        .with(user("test").roles("USER", "ADMIN")))
+                .andExpect(status().isOk());
     }
 
     @ParameterizedTest
@@ -109,7 +198,8 @@ class ThemeControllerTest {
 
         mockMvc.perform(put("/themes")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
+                        .content(requestBody)
+                        .with(user("test").roles("USER", "ADMIN")))
                 .andExpect(status().isBadRequest());
     }
 
@@ -123,13 +213,21 @@ class ThemeControllerTest {
 
         mockMvc.perform(put("/themes")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(requestBody))
+                        .content(requestBody)
+                        .with(user("test").roles("USER", "ADMIN")))
                 .andExpect(status().isBadRequest());
     }
 
     @Test
-    void deveDeletarTema() throws Exception {
+    void deveProibirDeletarTemaParaNaoAutenticado() throws Exception {
         mockMvc.perform(delete("/themes/{id}", 1L))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void deveDeletarTemaParaAutenticado() throws Exception {
+        mockMvc.perform(delete("/themes/{id}", 1L)
+                        .with(user("test").roles("USER", "ADMIN")))
                 .andExpect(status().isNoContent());
     }
 
@@ -138,7 +236,8 @@ class ThemeControllerTest {
         doThrow(new ObjectRetrievalFailureException(Theme.class, 1L))
                 .when(themeService).delete(1L);
 
-        mockMvc.perform(delete("/themes/{id}", 1L))
+        mockMvc.perform(delete("/themes/{id}", 1L)
+                        .with(user("test").roles("USER", "ADMIN")))
                 .andExpect(status().isNotFound());
     }
 }

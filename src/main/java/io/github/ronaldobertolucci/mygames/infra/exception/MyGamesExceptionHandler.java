@@ -4,11 +4,11 @@ import jakarta.persistence.EntityNotFoundException;
 import org.hibernate.TypeMismatchException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.HttpStatusCode;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.orm.ObjectRetrievalFailureException;
 import org.springframework.orm.jpa.JpaObjectRetrievalFailureException;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.MissingServletRequestParameterException;
@@ -65,6 +65,10 @@ public class MyGamesExceptionHandler {
         return ResponseEntity.badRequest().body(ex.getMessage());
     }
 
+    @ExceptionHandler(InternalAuthenticationServiceException.class)
+    public ResponseEntity handle401() {
+        return ResponseEntity.status(401).build();
+    }
 
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity handle409(org.springframework.dao.DataIntegrityViolationException ex) {
