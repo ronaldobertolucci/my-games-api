@@ -1,12 +1,12 @@
 package io.github.ronaldobertolucci.mygames.controller;
 
 import io.github.ronaldobertolucci.mygames.config.SecurityConfigurations;
-import io.github.ronaldobertolucci.mygames.model.store.Store;
-import io.github.ronaldobertolucci.mygames.model.store.StoreDto;
-import io.github.ronaldobertolucci.mygames.model.store.SaveStoreDto;
+import io.github.ronaldobertolucci.mygames.model.source.Source;
+import io.github.ronaldobertolucci.mygames.model.source.SourceDto;
+import io.github.ronaldobertolucci.mygames.model.source.SaveSourceDto;
 import io.github.ronaldobertolucci.mygames.model.user.UserRepository;
 import io.github.ronaldobertolucci.mygames.service.security.TokenService;
-import io.github.ronaldobertolucci.mygames.service.store.StoreService;
+import io.github.ronaldobertolucci.mygames.service.source.SourceService;
 import jakarta.persistence.EntityNotFoundException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -32,9 +32,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(StoreController.class)
+@WebMvcTest(SourceController.class)
 @Import({SecurityConfigurations.class})
-class StoreControllerTest {
+class SourceControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
@@ -46,57 +46,57 @@ class StoreControllerTest {
     private UserRepository userRepository;
 
     @MockitoBean
-    private StoreService storeService;
+    private SourceService sourceService;
 
     @Test
     void deveProibirListarTodasAsLojasParaNaoAutenticado() throws Exception {
-        Page<Store> stores = new PageImpl<>(
-                List.of(new Store(new SaveStoreDto("Store Name"))),
+        Page<Source> sources = new PageImpl<>(
+                List.of(new Source(new SaveSourceDto("Source Name"))),
                 PageRequest.of(0,20),
                 1);
-        when(storeService.findAll(any())).thenReturn(stores.map(StoreDto::new));
+        when(sourceService.findAll(any())).thenReturn(sources.map(SourceDto::new));
 
-        mockMvc.perform(get("/stores"))
+        mockMvc.perform(get("/sources"))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     void deveListarTodasAsLojasParaAutenticado() throws Exception {
-        Page<Store> stores = new PageImpl<>(
-                List.of(new Store(new SaveStoreDto("Store Name"))),
+        Page<Source> sources = new PageImpl<>(
+                List.of(new Source(new SaveSourceDto("Source Name"))),
                 PageRequest.of(0,20),
                 1);
-        when(storeService.findAll(any())).thenReturn(stores.map(StoreDto::new));
+        when(sourceService.findAll(any())).thenReturn(sources.map(SourceDto::new));
 
-        mockMvc.perform(get("/stores")
+        mockMvc.perform(get("/sources")
                         .with(user("test").roles("USER", "ADMIN")))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.content[0].name").value("store name"));
+                .andExpect(jsonPath("$.content[0].name").value("source name"));
     }
 
     @Test
     void deveProibirDetalharLojaParaNaoAutenticado() throws Exception {
-        when(storeService.detail(1L)).thenReturn(new StoreDto(1L, "store name"));
+        when(sourceService.detail(1L)).thenReturn(new SourceDto(1L, "source name"));
 
-        mockMvc.perform(get("/stores/{id}", 1L))
+        mockMvc.perform(get("/sources/{id}", 1L))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     void deveDetalharLojaParaAutenticado() throws Exception {
-        when(storeService.detail(1L)).thenReturn(new StoreDto(1L, "store name"));
+        when(sourceService.detail(1L)).thenReturn(new SourceDto(1L, "source name"));
 
-        mockMvc.perform(get("/stores/{id}", 1L)
+        mockMvc.perform(get("/sources/{id}", 1L)
                         .with(user("test").roles("USER", "ADMIN")))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.name").value("store name"));
+                .andExpect(jsonPath("$.name").value("source name"));
     }
 
     @Test
     void deveFalharQuandoNaoEncontrarLojaNoDetalhamento() throws Exception {
-        when(storeService.detail(1L)).thenThrow(EntityNotFoundException.class);
+        when(sourceService.detail(1L)).thenThrow(EntityNotFoundException.class);
 
-        mockMvc.perform(get("/stores/{id}", 1L)
+        mockMvc.perform(get("/sources/{id}", 1L)
                         .with(user("test").roles("USER", "ADMIN")))
                 .andExpect(status().isNotFound());
     }
@@ -110,7 +110,7 @@ class StoreControllerTest {
             }
             """.formatted(name);
 
-        mockMvc.perform(post("/stores")
+        mockMvc.perform(post("/sources")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody)
                         .with(user("test").roles("USER", "ADMIN")))
@@ -121,13 +121,13 @@ class StoreControllerTest {
     void deveProibirCriarQuandoNomeValidoParaNaoAutenticado() throws Exception {
         String requestBody = """
             {
-                "name": "Store name"
+                "name": "Source name"
             }
             """;
 
-        when(storeService.save(any())).thenReturn(new StoreDto(1L,"store name"));
+        when(sourceService.save(any())).thenReturn(new SourceDto(1L,"source name"));
 
-        mockMvc.perform(post("/stores")
+        mockMvc.perform(post("/sources")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isForbidden());
@@ -137,13 +137,13 @@ class StoreControllerTest {
     void deveCriarQuandoNomeValidoParaAutenticado() throws Exception {
         String requestBody = """
             {
-                "name": "Store name"
+                "name": "Source name"
             }
             """;
 
-        when(storeService.save(any())).thenReturn(new StoreDto(1L,"store name"));
+        when(sourceService.save(any())).thenReturn(new SourceDto(1L,"source name"));
 
-        mockMvc.perform(post("/stores")
+        mockMvc.perform(post("/sources")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody)
                         .with(user("test").roles("USER", "ADMIN")))
@@ -155,13 +155,13 @@ class StoreControllerTest {
         String requestBody = """
             {
                 "id": 1,
-                "name": "Store name"
+                "name": "Source name"
             }
             """;
 
-        when(storeService.save(any())).thenReturn(new StoreDto(1L,"store name"));
+        when(sourceService.save(any())).thenReturn(new SourceDto(1L,"source name"));
 
-        mockMvc.perform(post("/stores")
+        mockMvc.perform(post("/sources")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody))
                 .andExpect(status().isForbidden());
@@ -172,13 +172,13 @@ class StoreControllerTest {
         String requestBody = """
             {
                 "id": 1,
-                "name": "Store name"
+                "name": "Source name"
             }
             """;
 
-        when(storeService.save(any())).thenReturn(new StoreDto(1L,"store name"));
+        when(sourceService.save(any())).thenReturn(new SourceDto(1L,"source name"));
 
-        mockMvc.perform(post("/stores")
+        mockMvc.perform(post("/sources")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody)
                         .with(user("test").roles("USER", "ADMIN")))
@@ -195,7 +195,7 @@ class StoreControllerTest {
             }
             """.formatted(name);
 
-        mockMvc.perform(put("/stores")
+        mockMvc.perform(put("/sources")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody)
                         .with(user("test").roles("USER", "ADMIN")))
@@ -206,11 +206,11 @@ class StoreControllerTest {
     void deveFalharQuandoIdNuloNaAtualizacao() throws Exception {
         String requestBody = """
             {
-                "name": "Store Name"
+                "name": "Source Name"
             }
             """;
 
-        mockMvc.perform(put("/stores")
+        mockMvc.perform(put("/sources")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(requestBody)
                         .with(user("test").roles("USER", "ADMIN")))
@@ -219,24 +219,24 @@ class StoreControllerTest {
 
     @Test
     void deveProibirDeletarLojaParaNaoAutenticado() throws Exception {
-        mockMvc.perform(delete("/stores/{id}", 1L))
+        mockMvc.perform(delete("/sources/{id}", 1L))
                 .andExpect(status().isForbidden());
     }
 
 
     @Test
     void deveDeletarLojaParaAutenticado() throws Exception {
-        mockMvc.perform(delete("/stores/{id}", 1L)
+        mockMvc.perform(delete("/sources/{id}", 1L)
                         .with(user("test").roles("USER", "ADMIN")))
                 .andExpect(status().isNoContent());
     }
 
     @Test
     void deveFalharQuandoNaoEncontrarLojaNaDelecao() throws Exception {
-        doThrow(new ObjectRetrievalFailureException(Store.class, 1L))
-                .when(storeService).delete(1L);
+        doThrow(new ObjectRetrievalFailureException(Source.class, 1L))
+                .when(sourceService).delete(1L);
 
-        mockMvc.perform(delete("/stores/{id}", 1L)
+        mockMvc.perform(delete("/sources/{id}", 1L)
                         .with(user("test").roles("USER", "ADMIN")))
                 .andExpect(status().isNotFound());
     }

@@ -1,9 +1,9 @@
 package io.github.ronaldobertolucci.mygames.controller;
 
-import io.github.ronaldobertolucci.mygames.model.store.StoreDto;
-import io.github.ronaldobertolucci.mygames.model.store.SaveStoreDto;
-import io.github.ronaldobertolucci.mygames.model.store.UpdateStoreDto;
-import io.github.ronaldobertolucci.mygames.service.store.StoreService;
+import io.github.ronaldobertolucci.mygames.model.source.SourceDto;
+import io.github.ronaldobertolucci.mygames.model.source.SaveSourceDto;
+import io.github.ronaldobertolucci.mygames.model.source.UpdateSourceDto;
+import io.github.ronaldobertolucci.mygames.service.source.SourceService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,35 +14,35 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
 @RestController
-@RequestMapping("/stores")
-public class StoreController {
+@RequestMapping("/sources")
+public class SourceController {
 
     @Autowired
-    private StoreService service;
+    private SourceService service;
 
     @GetMapping
     public ResponseEntity list(@PageableDefault(size = 20, sort = {"name"}) Pageable pagination) {
-        Page<StoreDto> stores = service.findAll(pagination);
-        return ResponseEntity.ok(stores);
+        Page<SourceDto> sources = service.findAll(pagination);
+        return ResponseEntity.ok(sources);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity detail(@PathVariable Long id) {
-        StoreDto dto = service.detail(id);
+        SourceDto dto = service.detail(id);
         return ResponseEntity.ok(dto);
     }
 
 
     @PostMapping
-    public ResponseEntity save(@RequestBody @Valid SaveStoreDto data, UriComponentsBuilder builder) {
-        StoreDto dto = service.save(data);
-        var uri = builder.path("/stores/{id}").buildAndExpand(dto.id()).toUri();
+    public ResponseEntity save(@RequestBody @Valid SaveSourceDto data, UriComponentsBuilder builder) {
+        SourceDto dto = service.save(data);
+        var uri = builder.path("/sources/{id}").buildAndExpand(dto.id()).toUri();
         return ResponseEntity.created(uri).body(dto);
     }
 
     @PutMapping
-    public ResponseEntity update(@RequestBody @Valid UpdateStoreDto data) {
-        StoreDto dto = service.update(data);
+    public ResponseEntity update(@RequestBody @Valid UpdateSourceDto data) {
+        SourceDto dto = service.update(data);
         return ResponseEntity.ok(dto);
     }
 

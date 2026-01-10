@@ -1,7 +1,7 @@
 package io.github.ronaldobertolucci.mygames.model.platform;
 
-import io.github.ronaldobertolucci.mygames.model.store.Store;
-import io.github.ronaldobertolucci.mygames.model.store.StoreRepository;
+import io.github.ronaldobertolucci.mygames.model.source.Source;
+import io.github.ronaldobertolucci.mygames.model.source.SourceRepository;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
@@ -24,7 +24,7 @@ class PlatformTest {
     private PlatformRepository platformRepository;
 
     @Autowired
-    private StoreRepository storeRepository;
+    private SourceRepository sourceRepository;
 
     @Test
     void deveSalvarPlataformaComDadosCorretos() {

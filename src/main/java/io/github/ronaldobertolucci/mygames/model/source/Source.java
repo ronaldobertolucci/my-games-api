@@ -1,4 +1,4 @@
-package io.github.ronaldobertolucci.mygames.model.store;
+package io.github.ronaldobertolucci.mygames.model.source;
 
 import jakarta.persistence.*;
 import lombok.EqualsAndHashCode;
@@ -7,22 +7,22 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
-@Table(name = "stores")
+@Table(name = "sources")
 @Getter
 @Setter
 @NoArgsConstructor
 @EqualsAndHashCode(of = "name")
-public class Store {
+public class Source {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private String name;
 
-    public Store(SaveStoreDto dto) {
+    public Source(SaveSourceDto dto) {
         this.name = normalizeName(dto.name());
     }
 
-    public void update(UpdateStoreDto dto) {
+    public void update(UpdateSourceDto dto) {
         this.name = normalizeName(dto.name());
     }
 
