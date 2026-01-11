@@ -23,7 +23,7 @@ public class UserService {
         return companies.map(UserDto::new);
     }
 
-    public UserDetails findByUsername(String username) {
+    public User findByUsername(String username) {
         return repository.findByUsername(username);
     }
 
