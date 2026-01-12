@@ -1,6 +1,6 @@
 package io.github.ronaldobertolucci.mygames.controller;
 
-import io.github.ronaldobertolucci.mygames.config.SecurityConfigurations;
+import io.github.ronaldobertolucci.mygames.config.security.SecurityConfigurations;
 import io.github.ronaldobertolucci.mygames.model.theme.Theme;
 import io.github.ronaldobertolucci.mygames.model.theme.ThemeDto;
 import io.github.ronaldobertolucci.mygames.model.theme.SaveThemeDto;

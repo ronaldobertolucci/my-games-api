@@ -1,4 +1,4 @@
-package io.github.ronaldobertolucci.mygames.infra.security;
+package io.github.ronaldobertolucci.mygames.config.security;
 
 import io.github.ronaldobertolucci.mygames.model.user.UserRepository;
 import io.github.ronaldobertolucci.mygames.service.security.TokenService;

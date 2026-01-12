@@ -1,6 +1,5 @@
-package io.github.ronaldobertolucci.mygames.config;
+package io.github.ronaldobertolucci.mygames.config.security;
 
-import io.github.ronaldobertolucci.mygames.infra.security.SecurityFilter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

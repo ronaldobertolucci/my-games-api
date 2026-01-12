@@ -1,6 +1,6 @@
 package io.github.ronaldobertolucci.mygames.controller;
 
-import io.github.ronaldobertolucci.mygames.config.SecurityConfigurations;
+import io.github.ronaldobertolucci.mygames.config.security.SecurityConfigurations;
 import io.github.ronaldobertolucci.mygames.model.source.Source;
 import io.github.ronaldobertolucci.mygames.model.source.SourceDto;
 import io.github.ronaldobertolucci.mygames.model.source.SaveSourceDto;

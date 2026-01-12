@@ -1,6 +1,6 @@
 package io.github.ronaldobertolucci.mygames.controller;
 
-import io.github.ronaldobertolucci.mygames.config.SecurityConfigurations;
+import io.github.ronaldobertolucci.mygames.config.security.SecurityConfigurations;
 import io.github.ronaldobertolucci.mygames.model.company.Company;
 import io.github.ronaldobertolucci.mygames.model.company.CompanyDto;
 import io.github.ronaldobertolucci.mygames.model.company.SaveCompanyDto;

@@ -1,6 +1,6 @@
 package io.github.ronaldobertolucci.mygames.controller;
 
-import io.github.ronaldobertolucci.mygames.config.SecurityConfigurations;
+import io.github.ronaldobertolucci.mygames.config.security.SecurityConfigurations;
 import io.github.ronaldobertolucci.mygames.model.genre.Genre;
 import io.github.ronaldobertolucci.mygames.model.genre.GenreDto;
 import io.github.ronaldobertolucci.mygames.model.genre.SaveGenreDto;

@@ -1,6 +1,6 @@
 package io.github.ronaldobertolucci.mygames.controller;
 
-import io.github.ronaldobertolucci.mygames.config.SecurityConfigurations;
+import io.github.ronaldobertolucci.mygames.config.security.SecurityConfigurations;
 import io.github.ronaldobertolucci.mygames.model.user.*;
 import io.github.ronaldobertolucci.mygames.service.security.TokenService;
 import io.github.ronaldobertolucci.mygames.service.user.UserAuthenticationService;
@@ -12,7 +12,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.MediaType;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
