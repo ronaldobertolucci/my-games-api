@@ -19,26 +19,6 @@ import org.springframework.web.multipart.MultipartException;
 @RestControllerAdvice
 public class MyGamesExceptionHandler {
 
-    @ExceptionHandler(EntityNotFoundException.class)
-    public ResponseEntity handle404Entity() {
-        return ResponseEntity.notFound().build();
-    }
-
-    @ExceptionHandler(JpaObjectRetrievalFailureException.class)
-    public ResponseEntity handle404Jpa() {
-        return ResponseEntity.notFound().build();
-    }
-
-    @ExceptionHandler(ObjectRetrievalFailureException.class)
-    public ResponseEntity handle404Hibernate() {
-        return ResponseEntity.notFound().build();
-    }
-
-    @ExceptionHandler(UnprocessableEntity.class)
-    public ResponseEntity handle422(UnprocessableEntity ex) {
-        return ResponseEntity.status(422).body(ex.getMessage());
-    }
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity handle400(MethodArgumentNotValidException ex) {
         var errors = ex.getFieldErrors();
@@ -70,9 +50,34 @@ public class MyGamesExceptionHandler {
         return ResponseEntity.status(401).build();
     }
 
+    @ExceptionHandler(ForbiddenException.class)
+    public ResponseEntity handle403() {
+        return ResponseEntity.status(403).build();
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity handle404Entity() {
+        return ResponseEntity.notFound().build();
+    }
+
+    @ExceptionHandler(JpaObjectRetrievalFailureException.class)
+    public ResponseEntity handle404Jpa() {
+        return ResponseEntity.notFound().build();
+    }
+
+    @ExceptionHandler(ObjectRetrievalFailureException.class)
+    public ResponseEntity handle404Hibernate() {
+        return ResponseEntity.notFound().build();
+    }
+
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity handle409(org.springframework.dao.DataIntegrityViolationException ex) {
         return new ResponseEntity<>(ex.getMostSpecificCause().getMessage(),  HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(UnprocessableEntity.class)
+    public ResponseEntity handle422(UnprocessableEntity ex) {
+        return ResponseEntity.status(422).body(ex.getMessage());
     }
 
     @ExceptionHandler(Exception.class)
