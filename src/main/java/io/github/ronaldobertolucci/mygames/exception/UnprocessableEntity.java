@@ -1,4 +1,4 @@
-package io.github.ronaldobertolucci.mygames.infra.exception;
+package io.github.ronaldobertolucci.mygames.exception;
 
 public class UnprocessableEntity extends RuntimeException {
     public UnprocessableEntity(String message) {

@@ -1,7 +1,7 @@
 package io.github.ronaldobertolucci.mygames.service.mygame;
 
-import io.github.ronaldobertolucci.mygames.infra.exception.ForbiddenException;
-import io.github.ronaldobertolucci.mygames.infra.exception.UnprocessableEntity;
+import io.github.ronaldobertolucci.mygames.exception.ForbiddenException;
+import io.github.ronaldobertolucci.mygames.exception.UnprocessableEntity;
 import io.github.ronaldobertolucci.mygames.model.game.Game;
 import io.github.ronaldobertolucci.mygames.model.game.GameRepository;
 import io.github.ronaldobertolucci.mygames.model.mygame.*;

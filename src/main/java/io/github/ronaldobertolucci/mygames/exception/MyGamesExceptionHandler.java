@@ -1,4 +1,4 @@
-package io.github.ronaldobertolucci.mygames.infra.exception;
+package io.github.ronaldobertolucci.mygames.exception;
 
 import jakarta.persistence.EntityNotFoundException;
 import org.hibernate.TypeMismatchException;

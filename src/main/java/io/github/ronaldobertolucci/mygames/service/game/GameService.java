@@ -1,9 +1,8 @@
 package io.github.ronaldobertolucci.mygames.service.game;
 
-import io.github.ronaldobertolucci.mygames.infra.exception.UnprocessableEntity;
+import io.github.ronaldobertolucci.mygames.exception.UnprocessableEntity;
 import io.github.ronaldobertolucci.mygames.model.company.Company;
 import io.github.ronaldobertolucci.mygames.model.company.CompanyRepository;
-import io.github.ronaldobertolucci.mygames.model.game.*;
 import io.github.ronaldobertolucci.mygames.model.game.*;
 import io.github.ronaldobertolucci.mygames.model.genre.Genre;
 import io.github.ronaldobertolucci.mygames.model.genre.GenreRepository;
@@ -11,7 +10,6 @@ import io.github.ronaldobertolucci.mygames.model.theme.Theme;
 import io.github.ronaldobertolucci.mygames.model.theme.ThemeRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;

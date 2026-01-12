@@ -1,6 +1,6 @@
 package io.github.ronaldobertolucci.mygames.service.mygame;
 
-import io.github.ronaldobertolucci.mygames.infra.exception.ForbiddenException;
+import io.github.ronaldobertolucci.mygames.exception.ForbiddenException;
 import io.github.ronaldobertolucci.mygames.model.company.Company;
 import io.github.ronaldobertolucci.mygames.model.company.CompanyRepository;
 import io.github.ronaldobertolucci.mygames.model.game.Game;
@@ -14,7 +14,6 @@ import io.github.ronaldobertolucci.mygames.model.user.Role;
 import io.github.ronaldobertolucci.mygames.model.user.User;
 import io.github.ronaldobertolucci.mygames.model.user.UserRepository;
 import jakarta.transaction.Transactional;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +26,6 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 
