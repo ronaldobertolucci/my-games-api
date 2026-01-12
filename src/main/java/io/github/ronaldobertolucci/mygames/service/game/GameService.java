@@ -119,6 +119,7 @@ public class GameService {
             Set<Theme> themes = new HashSet<>();
             for (Long themeId : themeIds) {
                 Theme theme = themeRepository.getReferenceById(themeId);
+                theme.toString(); // força o carregamento
                 themes.add(theme);
             }
             game.setThemes(themes);
@@ -132,6 +133,7 @@ public class GameService {
             Set<Genre> genres = new HashSet<>();
             for (Long genreId : genreIds) {
                 Genre genre = genreRepository.getReferenceById(genreId);
+                genre.toString(); // força o carregamento
                 genres.add(genre);
             }
             game.setGenres(genres);
@@ -143,6 +145,7 @@ public class GameService {
     private void setCompany(Long companyId, Game game) {
         try {
             Company company = companyRepository.getReferenceById(companyId);
+            company.toString(); // força o carregamento
             game.setCompany(company);
         } catch (EntityNotFoundException ex) {
             throw new UnprocessableEntity("One or more referenced resources do not exist");
