@@ -13,11 +13,11 @@ import io.github.ronaldobertolucci.mygames.model.user.User;
 import io.github.ronaldobertolucci.mygames.model.user.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class MyGameService {
@@ -37,10 +37,10 @@ public class MyGameService {
     @Autowired
     private SourceRepository sourceRepository;
 
-    public Page<MyGameDto> findByUser(Pageable pageable, String username) {
+    public List<MyGameDto> findByUser(String username) {
         User user = userRepository.findByUsername(username);
-        Page<MyGame> myGames = myGameRepository.findByUser(user, pageable);
-        return myGames.map(MyGameDto::new);
+        List<MyGame> myGames = myGameRepository.findByUser(user);
+        return myGames.stream().map(MyGameDto::new).toList();
     }
 
     public MyGameDto detail(Long id, String username) {

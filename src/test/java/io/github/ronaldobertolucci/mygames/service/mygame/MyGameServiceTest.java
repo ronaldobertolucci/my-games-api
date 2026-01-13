@@ -19,8 +19,6 @@ import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -74,10 +72,10 @@ class MyGameServiceTest {
         myGameService.save(new SaveMyGameDto(game.getId(), platform.getId(), source.getId(), null), "username1");
         myGameService.save(new SaveMyGameDto(game.getId(), platform.getId(), source.getId(), null), "username2");
 
-        Page<MyGameDto> myGames = myGameService.findByUser(PageRequest.of(0, 10), "username1");
+        List<MyGameDto> myGames = myGameService.findByUser("username1");
 
-        assertEquals(1, myGames.getTotalElements());
-        assertEquals(user1.getId(), myGames.getContent().getFirst().userId());
+        assertEquals(1, myGames.size());
+        assertEquals(user1.getId(), myGames.getFirst().userId());
     }
 
     @Test

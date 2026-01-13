@@ -16,9 +16,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.orm.ObjectRetrievalFailureException;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -52,11 +49,8 @@ class MyGameControllerTest {
 
     @Test
     void deveProbirListarTodosOsMeusJogosParaNaoAutenticado() throws Exception {
-        Page<MyGameDto> myGames = new PageImpl<>(
-                List.of(new MyGameDto(getGenericMyGame())),
-                PageRequest.of(0,20),
-                1);
-        when(myGameService.findByUser(any(), any())).thenReturn(myGames);
+        List<MyGameDto> myGames = List.of(new MyGameDto(getGenericMyGame()));
+        when(myGameService.findByUser(any())).thenReturn(myGames);
 
         mockMvc.perform(get("/my-games"))
                 .andExpect(status().isForbidden());
@@ -64,11 +58,8 @@ class MyGameControllerTest {
 
     @Test
     void deveListarTodosOsMeusJogosParaAutenticado() throws Exception {
-        Page<MyGameDto> myGames = new PageImpl<>(
-                List.of(new MyGameDto(getGenericMyGame())),
-                PageRequest.of(0,20),
-                1);
-        when(myGameService.findByUser(any(), any())).thenReturn(myGames);
+        List<MyGameDto> myGames = List.of(new MyGameDto(getGenericMyGame()));
+        when(myGameService.findByUser(any())).thenReturn(myGames);
 
         mockMvc.perform(get("/my-games")
                         .with(user("test").roles("USER", "ADMIN")))
