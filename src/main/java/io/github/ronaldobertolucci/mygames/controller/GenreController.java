@@ -6,12 +6,14 @@ import io.github.ronaldobertolucci.mygames.model.genre.UpdateGenreDto;
 import io.github.ronaldobertolucci.mygames.service.genre.GenreService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/genres")
@@ -22,8 +24,8 @@ public class GenreController {
 
     @GetMapping
     public ResponseEntity list(@PageableDefault(size = 20, sort = {"name"}) Pageable pagination) {
-        Page<GenreDto> genres = service.findAll(pagination);
-        return ResponseEntity.ok(genres);
+        List<GenreDto> genres = service.findAll();
+        return ResponseEntity.ok(new PageImpl<>(genres, pagination, genres.size()));
     }
 
     @GetMapping("/{id}")

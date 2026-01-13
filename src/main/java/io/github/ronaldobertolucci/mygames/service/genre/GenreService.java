@@ -3,10 +3,10 @@ package io.github.ronaldobertolucci.mygames.service.genre;
 import io.github.ronaldobertolucci.mygames.model.genre.*;
 import io.github.ronaldobertolucci.mygames.model.genre.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class GenreService {
@@ -14,9 +14,9 @@ public class GenreService {
     @Autowired
     private GenreRepository repository;
 
-    public Page<GenreDto> findAll(Pageable pageable) {
-        Page<Genre> companies = repository.findAll(pageable);
-        return companies.map(GenreDto::new);
+    public List<GenreDto> findAll() {
+        List<Genre> companies = repository.findAll();
+        return companies.stream().map(GenreDto::new).toList();
     }
 
     public GenreDto detail(Long id) {
