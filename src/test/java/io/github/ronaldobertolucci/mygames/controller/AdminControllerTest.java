@@ -1,21 +1,26 @@
 package io.github.ronaldobertolucci.mygames.controller;
 
 import io.github.ronaldobertolucci.mygames.config.security.SecurityConfigurations;
+import io.github.ronaldobertolucci.mygames.model.company.CompanyDto;
+import io.github.ronaldobertolucci.mygames.model.game.GameDto;
+import io.github.ronaldobertolucci.mygames.model.mygame.MyGameDto;
+import io.github.ronaldobertolucci.mygames.model.mygame.Status;
+import io.github.ronaldobertolucci.mygames.model.platform.PlatformDto;
+import io.github.ronaldobertolucci.mygames.model.source.SourceDto;
 import io.github.ronaldobertolucci.mygames.model.user.Role;
 import io.github.ronaldobertolucci.mygames.model.user.UserDto;
 import io.github.ronaldobertolucci.mygames.model.user.UserRepository;
+import io.github.ronaldobertolucci.mygames.service.mygame.MyGameService;
 import io.github.ronaldobertolucci.mygames.service.security.TokenService;
 import io.github.ronaldobertolucci.mygames.service.user.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
@@ -40,6 +45,55 @@ class AdminControllerTest {
 
     @MockitoBean
     private UserService userService;
+
+    @MockitoBean
+    private MyGameService myGameService;
+
+    @Test
+    void deveProbirListarMeusJogosParaNaoAutenticado() throws Exception {
+        GameDto gameDto = new GameDto(1L, "game title", "game description", LocalDate.parse("2026-01-01"),
+                new CompanyDto(1L, "company name"), List.of(), List.of());
+        PlatformDto platformDto = new PlatformDto(1L, "platform name");
+        SourceDto sourceDto = new SourceDto(1L, "source name");
+        List<MyGameDto> myGames = List.of(new MyGameDto(1L, 1L, gameDto, platformDto, sourceDto, Status.COMPLETED));
+        when(myGameService.findAll()).thenReturn(myGames);
+
+        mockMvc.perform(get("/admin/my-games"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void deveProbirListarTodosMeusJogosParaAutenticadoUser() throws Exception {
+        GameDto gameDto = new GameDto(1L, "game title", "game description", LocalDate.parse("2026-01-01"),
+                new CompanyDto(1L, "company name"), List.of(), List.of());
+        PlatformDto platformDto = new PlatformDto(1L, "platform name");
+        SourceDto sourceDto = new SourceDto(1L, "source name");
+        List<MyGameDto> myGames = List.of(new MyGameDto(1L, 1L, gameDto, platformDto, sourceDto, Status.COMPLETED));
+        when(myGameService.findAll()).thenReturn(myGames);
+
+        mockMvc.perform(get("/admin/my-games")
+                        .with(user("user@email.com").roles("USER")))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void deveListarTodosOsMeusJogosParaAutenticadoAdmin() throws Exception {
+        GameDto gameDto = new GameDto(1L, "game title", "game description", LocalDate.parse("2026-01-01"),
+                new CompanyDto(1L, "company name"), List.of(), List.of());
+        PlatformDto platformDto = new PlatformDto(1L, "platform name");
+        SourceDto sourceDto = new SourceDto(1L, "source name");
+        List<MyGameDto> myGames = List.of(new MyGameDto(1L, 1L, gameDto, platformDto, sourceDto, Status.COMPLETED));
+        when(myGameService.findAll()).thenReturn(myGames);
+
+        mockMvc.perform(get("/admin/my-games")
+                        .with(user("admin@admin.com").roles("ADMIN")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].game.title").value("game title"))
+                .andExpect(jsonPath("$.content[0].platform.name").value("platform name"))
+                .andExpect(jsonPath("$.content[0].source.name").value("source name"))
+                .andExpect(jsonPath("$.content[0].status").value(Status.COMPLETED.name()))
+                .andExpect(jsonPath("$.content[0].id").value(1L));
+    }
 
     @Test
     void deveProbirListarTodosOsUsuariosParaNaoAutenticado() throws Exception {

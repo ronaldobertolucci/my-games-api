@@ -61,6 +61,24 @@ class MyGameServiceTest {
 
     @Test
     @Transactional
+    void deveListarTodosMeusJogos() {
+        Platform platform = platformRepository.save(getPlatform(null, "PC"));
+        Source source = sourceRepository.save(getSource(null, "Steam"));
+        Company company = companyRepository.save(getCompany(null, "CD Projekt"));
+        Game game = gameRepository.save(getGame(null, "The Witcher", company));
+
+        userRepository.save(getUser(null, "username1", "123456", Role.USER));
+        userRepository.save(getUser(null, "username2", "123456", Role.USER));
+        myGameService.save(new SaveMyGameDto(game.getId(), platform.getId(), source.getId(), null), "username1");
+        myGameService.save(new SaveMyGameDto(game.getId(), platform.getId(), source.getId(), null), "username2");
+
+        List<MyGameDto> myGames = myGameService.findAll();
+
+        assertEquals(2, myGames.size());
+    }
+
+    @Test
+    @Transactional
     void deveListarSomenteMeuJogoDoUsuarioDono() {
         Platform platform = platformRepository.save(getPlatform(null, "PC"));
         Source source = sourceRepository.save(getSource(null, "Steam"));

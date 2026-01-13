@@ -37,6 +37,11 @@ public class MyGameService {
     @Autowired
     private SourceRepository sourceRepository;
 
+    public List<MyGameDto> findAll() {
+        List<MyGame> myGames = myGameRepository.findAll();
+        return myGames.stream().map(MyGameDto::new).toList();
+    }
+
     public List<MyGameDto> findByUser(String username) {
         User user = userRepository.findByUsername(username);
         List<MyGame> myGames = myGameRepository.findByUser(user);
