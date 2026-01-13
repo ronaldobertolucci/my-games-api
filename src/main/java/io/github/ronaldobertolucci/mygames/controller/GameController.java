@@ -6,12 +6,14 @@ import io.github.ronaldobertolucci.mygames.model.game.UpdateGameDto;
 import io.github.ronaldobertolucci.mygames.service.game.GameService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/games")
@@ -22,8 +24,8 @@ public class GameController {
 
     @GetMapping
     public ResponseEntity list(@PageableDefault(size = 20, sort = {"title"}) Pageable pagination) {
-        Page<GameDto> games = service.findAll(pagination);
-        return ResponseEntity.ok(games);
+        List<GameDto> games = service.findAll();
+        return ResponseEntity.ok(new PageImpl<>(games, pagination, games.size()));
     }
 
     @GetMapping("/{id}")

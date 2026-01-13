@@ -10,8 +10,6 @@ import io.github.ronaldobertolucci.mygames.model.theme.Theme;
 import io.github.ronaldobertolucci.mygames.model.theme.ThemeRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,9 +32,9 @@ public class GameService {
     @Autowired
     private ThemeRepository themeRepository;
 
-    public Page<GameDto> findAll(Pageable pageable) {
-        Page<Game> games = gameRepository.findAll(pageable);
-        return games.map(GameDto::new);
+    public List<GameDto> findAll() {
+        List<Game> games = gameRepository.findAll();
+        return games.stream().map(GameDto::new).toList();
     }
 
     public GameDto detail(Long id) {
@@ -113,6 +111,11 @@ public class GameService {
     }
 
     private void setThemes(List<Long> themeIds, Game game) {
+        if (themeIds == null || themeIds.isEmpty()) {
+            game.setThemes(new HashSet<>());
+            return;
+        }
+
         try {
             Set<Theme> themes = new HashSet<>();
             for (Long themeId : themeIds) {
@@ -127,6 +130,11 @@ public class GameService {
     }
 
     private void setGenres(List<Long> genreIds, Game game) {
+        if (genreIds == null || genreIds.isEmpty()) {
+            game.setGenres(new HashSet<>());
+            return;
+        }
+
         try {
             Set<Genre> genres = new HashSet<>();
             for (Long genreId : genreIds) {

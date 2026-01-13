@@ -52,6 +52,11 @@ public class Game {
     }
 
     public void setDescription(String description) {
+        if (description == null) {
+            this.description = null;
+            return;
+        }
+
         this.description = description.toLowerCase().trim();
     }
 }

@@ -72,7 +72,7 @@ class GameControllerTest {
                 List.of(game),
                 PageRequest.of(0,20),
                 1);
-        when(gameService.findAll(any())).thenReturn(games.map(GameDto::new));
+        when(gameService.findAll()).thenReturn(games.stream().map(GameDto::new).toList());
 
         mockMvc.perform(get("/games"))
                 .andExpect(status().isForbidden());
@@ -96,7 +96,7 @@ class GameControllerTest {
                 List.of(game),
                 PageRequest.of(0,20),
                 1);
-        when(gameService.findAll(any())).thenReturn(games.map(GameDto::new));
+        when(gameService.findAll()).thenReturn(games.stream().map(GameDto::new).toList());
 
         mockMvc.perform(get("/games")
                         .with(user("test").roles("USER", "ADMIN")))
