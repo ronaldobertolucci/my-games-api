@@ -2,10 +2,10 @@ package io.github.ronaldobertolucci.mygames.service.source;
 
 import io.github.ronaldobertolucci.mygames.model.source.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class SourceService {
@@ -13,9 +13,9 @@ public class SourceService {
     @Autowired
     private SourceRepository repository;
 
-    public Page<SourceDto> findAll(Pageable pageable) {
-        Page<Source> sources = repository.findAll(pageable);
-        return sources.map(SourceDto::new);
+    public List<SourceDto> findAll() {
+        List<Source> sources = repository.findAll();
+        return sources.stream().map(SourceDto::new).toList();
     }
 
     public SourceDto detail(Long id) {

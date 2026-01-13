@@ -50,11 +50,8 @@ class SourceControllerTest {
 
     @Test
     void deveProibirListarTodasAsLojasParaNaoAutenticado() throws Exception {
-        Page<Source> sources = new PageImpl<>(
-                List.of(new Source(new SaveSourceDto("Source Name"))),
-                PageRequest.of(0,20),
-                1);
-        when(sourceService.findAll(any())).thenReturn(sources.map(SourceDto::new));
+        List<Source> sources = List.of(new Source(new SaveSourceDto("Source Name")));
+        when(sourceService.findAll()).thenReturn(sources.stream().map(SourceDto::new).toList());
 
         mockMvc.perform(get("/sources"))
                 .andExpect(status().isForbidden());
@@ -62,11 +59,8 @@ class SourceControllerTest {
 
     @Test
     void deveListarTodasAsLojasParaAutenticado() throws Exception {
-        Page<Source> sources = new PageImpl<>(
-                List.of(new Source(new SaveSourceDto("Source Name"))),
-                PageRequest.of(0,20),
-                1);
-        when(sourceService.findAll(any())).thenReturn(sources.map(SourceDto::new));
+        List<Source> sources = List.of(new Source(new SaveSourceDto("Source Name")));
+        when(sourceService.findAll()).thenReturn(sources.stream().map(SourceDto::new).toList());
 
         mockMvc.perform(get("/sources")
                         .with(user("test").roles("USER", "ADMIN")))
