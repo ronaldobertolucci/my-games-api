@@ -2,15 +2,17 @@ package io.github.ronaldobertolucci.mygames.service.user;
 
 import io.github.ronaldobertolucci.mygames.model.user.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+
 @Service
-public class UserService {
+public class UserService implements UserDetailsService {
 
     @Autowired
     private UserRepository repository;
@@ -18,12 +20,13 @@ public class UserService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    public Page<UserDto> findAll(Pageable pageable) {
-        Page<User> companies = repository.findAll(pageable);
-        return companies.map(UserDto::new);
+    public List<UserDto> findAll() {
+        List<User> companies = repository.findAll();
+        return companies.stream().map(UserDto::new).toList();
     }
 
-    public User findByUsername(String username) {
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         return repository.findByUsername(username);
     }
 

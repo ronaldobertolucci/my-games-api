@@ -3,7 +3,6 @@ package io.github.ronaldobertolucci.mygames.controller;
 import io.github.ronaldobertolucci.mygames.config.security.SecurityConfigurations;
 import io.github.ronaldobertolucci.mygames.model.user.*;
 import io.github.ronaldobertolucci.mygames.service.security.TokenService;
-import io.github.ronaldobertolucci.mygames.service.user.UserAuthenticationService;
 import io.github.ronaldobertolucci.mygames.service.user.UserService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,9 +36,6 @@ class AuthenticationControllerTest {
 
     @MockitoBean
     private UserService userService;
-
-    @MockitoBean
-    private UserAuthenticationService userAuthenticationService;
 
     @MockitoBean
     private AuthenticationManager manager;
@@ -76,7 +72,7 @@ class AuthenticationControllerTest {
             }""";
 
         UserRegistrationDto userRegistrationDto = new UserRegistrationDto("user@email.com", "123456");
-        when(userAuthenticationService.register(userRegistrationDto)).thenReturn(new UserDto(1L, "user@email.com", Role.USER, true));
+        when(userService.register(userRegistrationDto)).thenReturn(new UserDto(1L, "user@email.com", Role.USER, true));
 
         mockMvc.perform(post("/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
@@ -93,7 +89,7 @@ class AuthenticationControllerTest {
             }""";
 
         UserRegistrationDto userRegistrationDto = new UserRegistrationDto("user@email.com", "123456");
-        when(userAuthenticationService.register(userRegistrationDto)).thenThrow(DataIntegrityViolationException.class);
+        when(userService.register(userRegistrationDto)).thenThrow(DataIntegrityViolationException.class);
 
         mockMvc.perform(post("/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)

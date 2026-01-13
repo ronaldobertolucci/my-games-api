@@ -43,11 +43,8 @@ class AdminControllerTest {
 
     @Test
     void deveProbirListarTodosOsUsuariosParaNaoAutenticado() throws Exception {
-        Page<UserDto> users = new PageImpl<>(
-                List.of(new UserDto(1L, "user@email.com", Role.USER, true)),
-                PageRequest.of(0,20),
-                1);
-        when(userService.findAll(any())).thenReturn(users);
+        List<UserDto> users = List.of(new UserDto(1L, "user@email.com", Role.USER, true));
+        when(userService.findAll()).thenReturn(users);
 
         mockMvc.perform(get("/admin/users"))
                 .andExpect(status().isForbidden());
@@ -55,11 +52,8 @@ class AdminControllerTest {
 
     @Test
     void deveProbirListarTodosOsUsuariosParaAutenticadoUser() throws Exception {
-        Page<UserDto> users = new PageImpl<>(
-                List.of(new UserDto(1L, "user@email.com", Role.USER, true)),
-                PageRequest.of(0,20),
-                1);
-        when(userService.findAll(any())).thenReturn(users);
+        List<UserDto> users = List.of(new UserDto(1L, "user@email.com", Role.USER, true));
+        when(userService.findAll()).thenReturn(users);
 
         mockMvc.perform(get("/admin/users")
                         .with(user("user@email.com").roles("USER")))
@@ -68,11 +62,8 @@ class AdminControllerTest {
 
     @Test
     void deveListarTodosOsUsuariosParaAutenticadoAdmin() throws Exception {
-        Page<UserDto> users = new PageImpl<>(
-                List.of(new UserDto(1L, "user@email.com", Role.USER, true)),
-                PageRequest.of(0,20),
-                1);
-        when(userService.findAll(any())).thenReturn(users);
+        List<UserDto> users = List.of(new UserDto(1L, "user@email.com", Role.USER, true));
+        when(userService.findAll()).thenReturn(users);
 
         mockMvc.perform(get("/admin/users")
                         .with(user("admin@admin.com").roles("ADMIN")))
