@@ -50,11 +50,8 @@ class CompanyControllerTest {
 
     @Test
     void deveProbirListarTodasAsCompanhiasParaNaoAutenticado() throws Exception {
-        Page<Company> companies = new PageImpl<>(
-                List.of(new Company(new SaveCompanyDto("Company Name"))),
-                PageRequest.of(0,20),
-                1);
-        when(companyService.findAll(any())).thenReturn(companies.map(CompanyDto::new));
+        List<Company> companies = List.of(new Company(new SaveCompanyDto("Company Name")));
+        when(companyService.findAll()).thenReturn(companies.stream().map(CompanyDto::new).toList());
 
         mockMvc.perform(get("/companies"))
                 .andExpect(status().isForbidden());
@@ -62,11 +59,8 @@ class CompanyControllerTest {
 
     @Test
     void deveListarTodasAsCompanhiasParaAutenticado() throws Exception {
-        Page<Company> companies = new PageImpl<>(
-                List.of(new Company(new SaveCompanyDto("Company Name"))),
-                PageRequest.of(0,20),
-                1);
-        when(companyService.findAll(any())).thenReturn(companies.map(CompanyDto::new));
+        List<Company> companies = List.of(new Company(new SaveCompanyDto("Company Name")));
+        when(companyService.findAll()).thenReturn(companies.stream().map(CompanyDto::new).toList());
 
         mockMvc.perform(get("/companies")
                         .with(user("test").roles("USER", "ADMIN")))

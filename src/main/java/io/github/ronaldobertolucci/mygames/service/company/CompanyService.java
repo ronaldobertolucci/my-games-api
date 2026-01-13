@@ -3,10 +3,10 @@ package io.github.ronaldobertolucci.mygames.service.company;
 import io.github.ronaldobertolucci.mygames.model.company.*;
 import io.github.ronaldobertolucci.mygames.model.company.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class CompanyService {
@@ -14,9 +14,9 @@ public class CompanyService {
     @Autowired
     private CompanyRepository repository;
 
-    public Page<CompanyDto> findAll(Pageable pageable) {
-        Page<Company> companies = repository.findAll(pageable);
-        return companies.map(CompanyDto::new);
+    public List<CompanyDto> findAll() {
+        List<Company> companies = repository.findAll();
+        return companies.stream().map(CompanyDto::new).toList();
     }
 
     public CompanyDto detail(Long id) {

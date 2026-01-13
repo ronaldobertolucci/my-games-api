@@ -6,12 +6,14 @@ import io.github.ronaldobertolucci.mygames.model.company.UpdateCompanyDto;
 import io.github.ronaldobertolucci.mygames.service.company.CompanyService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/companies")
@@ -22,8 +24,8 @@ public class CompanyController {
 
     @GetMapping
     public ResponseEntity list(@PageableDefault(size = 20, sort = {"name"}) Pageable pagination) {
-        Page<CompanyDto> companies = service.findAll(pagination);
-        return ResponseEntity.ok(companies);
+        List<CompanyDto> companies = service.findAll();
+        return ResponseEntity.ok(new PageImpl<>(companies, pagination, companies.size()));
     }
 
     @GetMapping("/{id}")
