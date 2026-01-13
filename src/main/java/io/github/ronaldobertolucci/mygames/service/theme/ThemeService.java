@@ -3,10 +3,10 @@ package io.github.ronaldobertolucci.mygames.service.theme;
 import io.github.ronaldobertolucci.mygames.model.theme.*;
 import io.github.ronaldobertolucci.mygames.model.theme.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class ThemeService {
@@ -14,9 +14,9 @@ public class ThemeService {
     @Autowired
     private ThemeRepository repository;
 
-    public Page<ThemeDto> findAll(Pageable pageable) {
-        Page<Theme> companies = repository.findAll(pageable);
-        return companies.map(ThemeDto::new);
+    public List<ThemeDto> findAll() {
+        List<Theme> companies = repository.findAll();
+        return companies.stream().map(ThemeDto::new).toList();
     }
 
     public ThemeDto detail(Long id) {

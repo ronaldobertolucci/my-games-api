@@ -14,9 +14,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.orm.ObjectRetrievalFailureException;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -50,11 +47,8 @@ class ThemeControllerTest {
 
     @Test
     void deveProibirListarTodosOsTemasParaNaoAutenticado() throws Exception {
-        Page<Theme> themes = new PageImpl<>(
-                List.of(new Theme(new SaveThemeDto("Theme Name"))),
-                PageRequest.of(0,20),
-                1);
-        when(themeService.findAll(any())).thenReturn(themes.map(ThemeDto::new));
+        List<Theme> themes = List.of(new Theme(new SaveThemeDto("Theme Name")));
+        when(themeService.findAll()).thenReturn(themes.stream().map(ThemeDto::new).toList());
 
         mockMvc.perform(get("/themes"))
                 .andExpect(status().isForbidden());
@@ -63,11 +57,8 @@ class ThemeControllerTest {
 
     @Test
     void deveListarTodosOsTemasParaAutenticado() throws Exception {
-        Page<Theme> themes = new PageImpl<>(
-                List.of(new Theme(new SaveThemeDto("Theme Name"))),
-                PageRequest.of(0,20),
-                1);
-        when(themeService.findAll(any())).thenReturn(themes.map(ThemeDto::new));
+        List<Theme> themes = List.of(new Theme(new SaveThemeDto("Theme Name")));
+        when(themeService.findAll()).thenReturn(themes.stream().map(ThemeDto::new).toList());
 
         mockMvc.perform(get("/themes")
                         .with(user("test").roles("USER", "ADMIN")))
