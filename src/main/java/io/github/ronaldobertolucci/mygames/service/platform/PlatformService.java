@@ -3,10 +3,10 @@ package io.github.ronaldobertolucci.mygames.service.platform;
 import io.github.ronaldobertolucci.mygames.model.platform.*;
 import io.github.ronaldobertolucci.mygames.model.platform.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class PlatformService {
@@ -14,9 +14,9 @@ public class PlatformService {
     @Autowired
     private PlatformRepository platformRepository;
 
-    public Page<PlatformDto> findAll(Pageable pageable) {
-        Page<Platform> platforms = platformRepository.findAll(pageable);
-        return platforms.map(PlatformDto::new);
+    public List<PlatformDto> findAll() {
+        List<Platform> platforms = platformRepository.findAll();
+        return platforms.stream().map(PlatformDto::new).toList();
     }
 
     public PlatformDto detail(Long id) {

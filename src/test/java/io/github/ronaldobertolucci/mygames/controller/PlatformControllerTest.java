@@ -50,11 +50,8 @@ class PlatformControllerTest {
 
     @Test
     void deveProibirListarTodasAsPlataformasParaNaoAutenticado() throws Exception {
-        Page<Platform> platforms = new PageImpl<>(
-                List.of(new Platform(new SavePlatformDto("Platform Name"))),
-                PageRequest.of(0,20),
-                1);
-        when(platformService.findAll(any())).thenReturn(platforms.map(PlatformDto::new));
+        List<Platform> platforms = List.of(new Platform(new SavePlatformDto("Platform Name")));
+        when(platformService.findAll()).thenReturn(platforms.stream().map(PlatformDto::new).toList());
 
         mockMvc.perform(get("/platforms"))
                 .andExpect(status().isForbidden());
@@ -62,11 +59,8 @@ class PlatformControllerTest {
 
     @Test
     void deveListarTodasAsPlataformasParaAutenticado() throws Exception {
-        Page<Platform> platforms = new PageImpl<>(
-                List.of(new Platform(new SavePlatformDto("Platform Name"))),
-                PageRequest.of(0,20),
-                1);
-        when(platformService.findAll(any())).thenReturn(platforms.map(PlatformDto::new));
+        List<Platform> platforms = List.of(new Platform(new SavePlatformDto("Platform Name")));
+        when(platformService.findAll()).thenReturn(platforms.stream().map(PlatformDto::new).toList());
 
         mockMvc.perform(get("/platforms")
                         .with(user("test").roles("USER", "ADMIN")))

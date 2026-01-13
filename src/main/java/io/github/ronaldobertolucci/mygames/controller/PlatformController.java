@@ -6,12 +6,14 @@ import io.github.ronaldobertolucci.mygames.model.platform.UpdatePlatformDto;
 import io.github.ronaldobertolucci.mygames.service.platform.PlatformService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/platforms")
@@ -22,8 +24,8 @@ public class PlatformController {
 
     @GetMapping
     public ResponseEntity list(@PageableDefault(size = 20, sort = {"name"}) Pageable pagination) {
-        Page<PlatformDto> platforms = service.findAll(pagination);
-        return ResponseEntity.ok(platforms);
+        List<PlatformDto> platforms = service.findAll();
+        return ResponseEntity.ok(new PageImpl<>(platforms, pagination, platforms.size()));
     }
 
     @GetMapping("/{id}")
