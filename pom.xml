@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>io.github.ronaldobertolucci</groupId>
-	<artifactId>mygames</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>MyGames</name>
-	<description>Project for manage my games</description>
+	<artifactId>my-games-api</artifactId>
+	<version>1.0.0</version>
+	<name>my-games-api</name>
+	<description>Back-end Spring Boot service providing a full CRUD API for game inventory management.</description>
 	<url/>
 	<licenses>
 		<license/>
