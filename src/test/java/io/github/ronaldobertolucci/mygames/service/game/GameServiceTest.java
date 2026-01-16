@@ -38,6 +38,43 @@ class GameServiceTest {
 
     @Autowired
     private GameService gameService;
+    
+    @Test
+    @Transactional
+    void deveListarVazioSeTituloNaoEncontrado() {
+        Genre genre = genreRepository.save(getGenre(null,"RPG"));
+        Theme theme = themeRepository.save(getTheme(null,"open world "));
+        Company company = companyRepository.save(getCompany(null, "CD Projekt"));
+
+        String gameTitle = "The Witcher";
+        String gameDescription = "RPG massa";
+        LocalDate gameReleasedAt = LocalDate.parse("2015-01-01");
+        SaveGameDto dto = new SaveGameDto(gameTitle, gameDescription, gameReleasedAt, company.getId(), List.of(genre.getId()), List.of(theme.getId()));
+        gameService.save(dto);
+
+        List<GameDto> games = gameService.findByTitleContaining("banana");
+
+        assertEquals(0, games.size());
+    }
+
+    @Test
+    @Transactional
+    void deveListarPeloTitulo() {
+        Genre genre = genreRepository.save(getGenre(null,"RPG"));
+        Theme theme = themeRepository.save(getTheme(null,"open world "));
+        Company company = companyRepository.save(getCompany(null, "CD Projekt"));
+
+        String gameTitle = "The Witcher";
+        String gameDescription = "RPG massa";
+        LocalDate gameReleasedAt = LocalDate.parse("2015-01-01");
+        SaveGameDto dto = new SaveGameDto(gameTitle, gameDescription, gameReleasedAt, company.getId(), List.of(genre.getId()), List.of(theme.getId()));
+        gameService.save(dto);
+
+        List<GameDto> games = gameService.findByTitleContaining("witcher");
+
+        assertEquals(gameTitle.toLowerCase().trim(), games.getFirst().title());
+        assertEquals(1, games.size());
+    }
 
     @Test
     @Transactional

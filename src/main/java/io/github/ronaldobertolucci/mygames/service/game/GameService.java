@@ -32,6 +32,11 @@ public class GameService {
     @Autowired
     private ThemeRepository themeRepository;
 
+    public List<GameDto> findByTitleContaining(String title) {
+        List<Game> games = gameRepository.findGamesByTitleContaining(title);
+        return games.stream().map(GameDto::new).toList();
+    }
+
     public List<GameDto> findAll() {
         List<Game> games = gameRepository.findAll();
         return games.stream().map(GameDto::new).toList();

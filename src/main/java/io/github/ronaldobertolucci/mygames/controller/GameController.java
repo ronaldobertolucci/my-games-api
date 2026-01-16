@@ -7,8 +7,7 @@ import io.github.ronaldobertolucci.mygames.service.game.GameService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -23,9 +22,18 @@ public class GameController {
     private GameService service;
 
     @GetMapping
-    public ResponseEntity list(@PageableDefault(size = 20, sort = {"title"}) Pageable pagination) {
-        List<GameDto> games = service.findAll();
-        return ResponseEntity.ok(new PageImpl<>(games, pagination, games.size()));
+    public ResponseEntity list(@RequestParam(value="title", required = false) String title,
+                                     @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+                                     @RequestParam(value = "size", required = false, defaultValue = "20") int size) {
+        List<GameDto> games;
+
+        if (title == null) {
+            games = service.findAll();
+            return ResponseEntity.ok(new PageImpl<>(games, PageRequest.of(page, size), games.size()));
+        }
+        
+        games = service.findByTitleContaining(title);
+        return ResponseEntity.ok(new PageImpl<>(games, PageRequest.of(page, size), games.size()));
     }
 
     @GetMapping("/{id}")
