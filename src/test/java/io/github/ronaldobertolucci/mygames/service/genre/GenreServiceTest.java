@@ -25,6 +25,29 @@ class GenreServiceTest {
 
     @Test
     @Transactional
+    void deveListarVazioSeNomeNaoEncontrado() {
+        String name = "Genre name";
+        GenreDto genreDto = genreService.save(new SaveGenreDto(name));
+
+        List<GenreDto> genres = genreService.findByNameContaining("banana");
+
+        assertEquals(0, genres.size());
+    }
+
+    @Test
+    @Transactional
+    void deveListarPeloNome() {
+        String name = "Genre name";
+        GenreDto genreDto = genreService.save(new SaveGenreDto(name));
+
+        List<GenreDto> genres = genreService.findByNameContaining("name");
+
+        assertEquals(name.toLowerCase().trim(), genres.getFirst().name());
+        assertEquals(1, genres.size());
+    }
+    
+    @Test
+    @Transactional
     void deveListarTodos() {
         String name = "Genre name";
         GenreDto genreDto = genreService.save(new SaveGenreDto(name));

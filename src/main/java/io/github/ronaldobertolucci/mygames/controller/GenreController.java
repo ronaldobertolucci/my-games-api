@@ -7,6 +7,7 @@ import io.github.ronaldobertolucci.mygames.service.genre.GenreService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
@@ -23,9 +24,18 @@ public class GenreController {
     private GenreService service;
 
     @GetMapping
-    public ResponseEntity list(@PageableDefault(size = 20, sort = {"name"}) Pageable pagination) {
-        List<GenreDto> genres = service.findAll();
-        return ResponseEntity.ok(new PageImpl<>(genres, pagination, genres.size()));
+    public ResponseEntity list(@RequestParam(value="name", required = false) String name,
+                                     @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+                                     @RequestParam(value = "size", required = false, defaultValue = "20") int size) {
+        List<GenreDto> genres;
+
+        if (name == null) {
+            genres = service.findAll();
+            return ResponseEntity.ok(new PageImpl<>(genres, PageRequest.of(page, size), genres.size()));
+        }
+        
+        genres = service.findByNameContaining(name);
+        return ResponseEntity.ok(new PageImpl<>(genres, PageRequest.of(page, size), genres.size()));
     }
 
     @GetMapping("/{id}")

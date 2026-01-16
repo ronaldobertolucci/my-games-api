@@ -14,6 +14,11 @@ public class GenreService {
     @Autowired
     private GenreRepository repository;
 
+    public List<GenreDto> findByNameContaining(String name) {
+        List<Genre> companies = repository.findGenresByNameContaining(name);
+        return companies.stream().map(GenreDto::new).toList();
+    }
+
     public List<GenreDto> findAll() {
         List<Genre> companies = repository.findAll();
         return companies.stream().map(GenreDto::new).toList();
