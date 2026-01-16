@@ -3,7 +3,6 @@ package io.github.ronaldobertolucci.mygames.service.platform;
 import io.github.ronaldobertolucci.mygames.model.platform.PlatformDto;
 import io.github.ronaldobertolucci.mygames.model.platform.SavePlatformDto;
 import io.github.ronaldobertolucci.mygames.model.platform.UpdatePlatformDto;
-import io.github.ronaldobertolucci.mygames.service.platform.PlatformService;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +21,29 @@ class PlatformServiceTest {
 
     @Autowired
     private PlatformService platformService;
+
+    @Test
+    @Transactional
+    void deveListarVazioSeNomeNaoEncontrado() {
+        String name = "Platform name";
+        PlatformDto platformDto = platformService.save(new SavePlatformDto(name));
+
+        List<PlatformDto> platforms = platformService.findByNameContaining("banana");
+
+        assertEquals(0, platforms.size());
+    }
+
+    @Test
+    @Transactional
+    void deveListarPeloNome() {
+        String name = "Platform name";
+        PlatformDto platformDto = platformService.save(new SavePlatformDto(name));
+
+        List<PlatformDto> platforms = platformService.findByNameContaining("name");
+
+        assertEquals(name.toLowerCase().trim(), platforms.getFirst().name());
+        assertEquals(1, platforms.size());
+    }
 
     @Test
     @Transactional

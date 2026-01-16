@@ -1,7 +1,6 @@
 package io.github.ronaldobertolucci.mygames.service.platform;
 
 import io.github.ronaldobertolucci.mygames.model.platform.*;
-import io.github.ronaldobertolucci.mygames.model.platform.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +12,11 @@ public class PlatformService {
 
     @Autowired
     private PlatformRepository platformRepository;
+
+    public List<PlatformDto> findByNameContaining(String name) {
+        List<Platform> platforms = platformRepository.findPlatformsByNameContaining(name);
+        return platforms.stream().map(PlatformDto::new).toList();
+    }
 
     public List<PlatformDto> findAll() {
         List<Platform> platforms = platformRepository.findAll();

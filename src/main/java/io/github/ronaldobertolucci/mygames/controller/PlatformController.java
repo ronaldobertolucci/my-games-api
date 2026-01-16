@@ -7,8 +7,7 @@ import io.github.ronaldobertolucci.mygames.service.platform.PlatformService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -23,9 +22,18 @@ public class PlatformController {
     private PlatformService service;
 
     @GetMapping
-    public ResponseEntity list(@PageableDefault(size = 20, sort = {"name"}) Pageable pagination) {
-        List<PlatformDto> platforms = service.findAll();
-        return ResponseEntity.ok(new PageImpl<>(platforms, pagination, platforms.size()));
+    public ResponseEntity list(@RequestParam(value="name", required = false) String name,
+                                     @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+                                     @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+        List<PlatformDto> platforms;
+
+        if (name == null) {
+            platforms = service.findAll();
+            return ResponseEntity.ok(new PageImpl<>(platforms, PageRequest.of(page, size), platforms.size()));
+        }
+        
+        platforms = service.findByNameContaining(name);
+        return ResponseEntity.ok(new PageImpl<>(platforms, PageRequest.of(page, size), platforms.size()));
     }
 
     @GetMapping("/{id}")
