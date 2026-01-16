@@ -79,6 +79,43 @@ class MyGameServiceTest {
 
     @Test
     @Transactional
+    void deveListarVazioMeuJogoDoUsuarioDonoPorTituloNaoEncontrado() {
+        Platform platform = platformRepository.save(getPlatform(null, "PC"));
+        Source source = sourceRepository.save(getSource(null, "Steam"));
+        Company company = companyRepository.save(getCompany(null, "CD Projekt"));
+        Game game = gameRepository.save(getGame(null, "The Witcher", company));
+
+        User user1 = userRepository.save(getUser(null, "username1", "123456", Role.USER));
+        userRepository.save(getUser(null, "username2", "123456", Role.USER));
+        myGameService.save(new SaveMyGameDto(game.getId(), platform.getId(), source.getId(), null), "username1");
+        myGameService.save(new SaveMyGameDto(game.getId(), platform.getId(), source.getId(), null), "username2");
+
+        List<MyGameDto> myGames = myGameService.findByUserAndGameTitleContaining("username1", "banana");
+
+        assertEquals(0, myGames.size());
+    }
+
+    @Test
+    @Transactional
+    void deveListarSomenteMeuJogoDoUsuarioDonoPorTitulo() {
+        Platform platform = platformRepository.save(getPlatform(null, "PC"));
+        Source source = sourceRepository.save(getSource(null, "Steam"));
+        Company company = companyRepository.save(getCompany(null, "CD Projekt"));
+        Game game = gameRepository.save(getGame(null, "The Witcher", company));
+
+        User user1 = userRepository.save(getUser(null, "username1", "123456", Role.USER));
+        userRepository.save(getUser(null, "username2", "123456", Role.USER));
+        myGameService.save(new SaveMyGameDto(game.getId(), platform.getId(), source.getId(), null), "username1");
+        myGameService.save(new SaveMyGameDto(game.getId(), platform.getId(), source.getId(), null), "username2");
+
+        List<MyGameDto> myGames = myGameService.findByUserAndGameTitleContaining("username1", "witcher");
+
+        assertEquals(1, myGames.size());
+        assertEquals(user1.getId(), myGames.getFirst().userId());
+    }
+
+    @Test
+    @Transactional
     void deveListarSomenteMeuJogoDoUsuarioDono() {
         Platform platform = platformRepository.save(getPlatform(null, "PC"));
         Source source = sourceRepository.save(getSource(null, "Steam"));
