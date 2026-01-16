@@ -3,6 +3,8 @@ package io.github.ronaldobertolucci.mygames.service.genre;
 import io.github.ronaldobertolucci.mygames.model.genre.*;
 import io.github.ronaldobertolucci.mygames.model.genre.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,14 +16,24 @@ public class GenreService {
     @Autowired
     private GenreRepository repository;
 
+    public Page<GenreDto> findByNameContaining(String name, Pageable pageable) {
+        Page<Genre> genres = repository.findGenresByNameContaining(name, pageable);
+        return genres.map(GenreDto::new);
+    }
+
     public List<GenreDto> findByNameContaining(String name) {
-        List<Genre> companies = repository.findGenresByNameContaining(name);
-        return companies.stream().map(GenreDto::new).toList();
+        List<Genre> genres = repository.findGenresByNameContaining(name);
+        return genres.stream().map(GenreDto::new).toList();
+    }
+
+    public Page<GenreDto> findAll(Pageable pageable) {
+        Page<Genre> genres = repository.findAll(pageable);
+        return genres.map(GenreDto::new);
     }
 
     public List<GenreDto> findAll() {
-        List<Genre> companies = repository.findAll();
-        return companies.stream().map(GenreDto::new).toList();
+        List<Genre> genres = repository.findAll();
+        return genres.stream().map(GenreDto::new).toList();
     }
 
     public GenreDto detail(Long id) {

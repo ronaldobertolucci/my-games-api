@@ -14,6 +14,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.orm.ObjectRetrievalFailureException;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -48,7 +50,8 @@ class GenreControllerTest {
     @Test
     void deveProibirListarTodasOsGenerosParaNaoAutenticado() throws Exception {
         List<Genre> genres = List.of(new Genre(new SaveGenreDto("Genre Name")));
-        when(genreService.findAll()).thenReturn(genres.stream().map(GenreDto::new).toList());
+        when(genreService.findAll(any())).thenReturn(new PageImpl<>(genres.stream().map(GenreDto::new).toList(),
+                PageRequest.of(0,20), genres.size()));
 
         mockMvc.perform(get("/genres"))
                 .andExpect(status().isForbidden());
@@ -57,7 +60,8 @@ class GenreControllerTest {
     @Test
     void deveListarTodasOsGenerosParaAutenticado() throws Exception {
         List<Genre> genres = List.of(new Genre(new SaveGenreDto("Genre Name")));
-        when(genreService.findAll()).thenReturn(genres.stream().map(GenreDto::new).toList());
+        when(genreService.findAll(any())).thenReturn(new PageImpl<>(genres.stream().map(GenreDto::new).toList(),
+                PageRequest.of(0,20), genres.size()));
 
         mockMvc.perform(get("/genres")
                         .with(user("test").roles("USER", "ADMIN")))

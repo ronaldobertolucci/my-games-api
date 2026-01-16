@@ -2,6 +2,8 @@ package io.github.ronaldobertolucci.mygames.service.user;
 
 import io.github.ronaldobertolucci.mygames.model.user.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -20,9 +22,14 @@ public class UserService implements UserDetailsService {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
+    public Page<UserDto> findAll(Pageable pageable) {
+        Page<User> users = repository.findAll(pageable);
+        return users.map(UserDto::new);
+    }
+
     public List<UserDto> findAll() {
-        List<User> companies = repository.findAll();
-        return companies.stream().map(UserDto::new).toList();
+        List<User> users = repository.findAll();
+        return users.stream().map(UserDto::new).toList();
     }
 
     @Override

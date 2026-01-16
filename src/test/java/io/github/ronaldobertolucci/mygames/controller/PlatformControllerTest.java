@@ -14,7 +14,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
@@ -51,7 +50,8 @@ class PlatformControllerTest {
     @Test
     void deveProibirListarTodasAsPlataformasParaNaoAutenticado() throws Exception {
         List<Platform> platforms = List.of(new Platform(new SavePlatformDto("Platform Name")));
-        when(platformService.findAll()).thenReturn(platforms.stream().map(PlatformDto::new).toList());
+        when(platformService.findAll(any())).thenReturn(new PageImpl<>(platforms.stream().map(PlatformDto::new).toList(),
+                PageRequest.of(0, 20), platforms.size()));
 
         mockMvc.perform(get("/platforms"))
                 .andExpect(status().isForbidden());
@@ -60,7 +60,8 @@ class PlatformControllerTest {
     @Test
     void deveListarTodasAsPlataformasParaAutenticado() throws Exception {
         List<Platform> platforms = List.of(new Platform(new SavePlatformDto("Platform Name")));
-        when(platformService.findAll()).thenReturn(platforms.stream().map(PlatformDto::new).toList());
+        when(platformService.findAll(any())).thenReturn(new PageImpl<>(platforms.stream().map(PlatformDto::new).toList(),
+                PageRequest.of(0, 20), platforms.size()));
 
         mockMvc.perform(get("/platforms")
                         .with(user("test").roles("USER", "ADMIN")))

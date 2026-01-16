@@ -7,7 +7,7 @@ import io.github.ronaldobertolucci.mygames.model.mygame.UpdateMyGameDto;
 import io.github.ronaldobertolucci.mygames.service.mygame.MyGameService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +17,6 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/my-games")
@@ -29,15 +28,15 @@ public class MyGameController {
     @GetMapping
     public ResponseEntity listByUser(@RequestParam(value="title", required = false) String title,
                                             @PageableDefault(size = 20, sort = {"game.title"}) Pageable pagination) {
-        List<MyGameDto> myGames;
+        Page<MyGameDto> myGames;
         
         if (title == null) {
-            myGames = service.findByUser(getUsername());
-            return ResponseEntity.ok(new PageImpl<>(myGames, pagination, myGames.size()));
+            myGames = service.findByUser(getUsername(), pagination);
+            return ResponseEntity.ok(myGames);
         }
         
-        myGames = service.findByUserAndGameTitleContaining(getUsername(), title);
-        return ResponseEntity.ok(new PageImpl<>(myGames, pagination, myGames.size()));
+        myGames = service.findByUserAndGameTitleContaining(getUsername(), title, pagination);
+        return ResponseEntity.ok(myGames);
     }
 
     @GetMapping("/{id}")

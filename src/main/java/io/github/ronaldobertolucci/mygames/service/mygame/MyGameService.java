@@ -13,6 +13,8 @@ import io.github.ronaldobertolucci.mygames.model.user.User;
 import io.github.ronaldobertolucci.mygames.model.user.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,14 +39,30 @@ public class MyGameService {
     @Autowired
     private SourceRepository sourceRepository;
 
+    public Page<MyGameDto> findByUserAndGameTitleContaining(String username, String title, Pageable pageable) {
+        Page<MyGame> myGames = myGameRepository.findMyGamesByUsernameAndGameTitleContaining(username, title, pageable);
+        return myGames.map(MyGameDto::new);
+    }
+
     public List<MyGameDto> findByUserAndGameTitleContaining(String username, String title) {
         List<MyGame> myGames = myGameRepository.findMyGamesByUsernameAndGameTitleContaining(username, title);
         return myGames.stream().map(MyGameDto::new).toList();
     }
 
+    public Page<MyGameDto> findAll(Pageable pageable) {
+        Page<MyGame> myGames = myGameRepository.findAll(pageable);
+        return myGames.map(MyGameDto::new);
+    }
+
     public List<MyGameDto> findAll() {
         List<MyGame> myGames = myGameRepository.findAll();
         return myGames.stream().map(MyGameDto::new).toList();
+    }
+
+    public Page<MyGameDto> findByUser(String username, Pageable pageable) {
+        User user = userRepository.findByUsername(username);
+        Page<MyGame> myGames = myGameRepository.findByUser(user, pageable);
+        return myGames.map(MyGameDto::new);
     }
 
     public List<MyGameDto> findByUser(String username) {

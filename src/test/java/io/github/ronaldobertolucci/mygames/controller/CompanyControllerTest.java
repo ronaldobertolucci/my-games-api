@@ -14,7 +14,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
@@ -51,7 +50,8 @@ class CompanyControllerTest {
     @Test
     void deveProbirListarTodasAsCompanhiasParaNaoAutenticado() throws Exception {
         List<Company> companies = List.of(new Company(new SaveCompanyDto("Company Name")));
-        when(companyService.findAll()).thenReturn(companies.stream().map(CompanyDto::new).toList());
+        when(companyService.findAll(any())).thenReturn(new PageImpl<>(companies.stream().map(CompanyDto::new).toList(),
+                PageRequest.of(0,20), companies.size()));
 
         mockMvc.perform(get("/companies"))
                 .andExpect(status().isForbidden());
@@ -60,7 +60,8 @@ class CompanyControllerTest {
     @Test
     void deveListarTodasAsCompanhiasParaAutenticado() throws Exception {
         List<Company> companies = List.of(new Company(new SaveCompanyDto("Company Name")));
-        when(companyService.findAll()).thenReturn(companies.stream().map(CompanyDto::new).toList());
+        when(companyService.findAll(any())).thenReturn(new PageImpl<>(companies.stream().map(CompanyDto::new).toList(),
+                PageRequest.of(0,20), companies.size()));
 
         mockMvc.perform(get("/companies")
                         .with(user("test").roles("USER", "ADMIN")))

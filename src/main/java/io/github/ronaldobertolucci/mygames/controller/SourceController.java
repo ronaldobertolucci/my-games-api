@@ -6,15 +6,13 @@ import io.github.ronaldobertolucci.mygames.model.source.UpdateSourceDto;
 import io.github.ronaldobertolucci.mygames.service.source.SourceService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/sources")
@@ -27,15 +25,16 @@ public class SourceController {
     public ResponseEntity list(@RequestParam(value="name", required = false) String name,
                                      @RequestParam(value = "page", required = false, defaultValue = "0") int page,
                                      @RequestParam(value = "size", required = false, defaultValue = "20") int size) {
-        List<SourceDto> sources;
+        Page<SourceDto> sources;
+        Pageable pageable = PageRequest.of(page, size);
 
         if (name == null) {
-            sources = service.findAll();
-            return ResponseEntity.ok(new PageImpl<>(sources, PageRequest.of(page, size), sources.size()));
+            sources = service.findAll(pageable);
+            return ResponseEntity.ok(sources);
         }
         
-        sources = service.findByNameContaining(name);
-        return ResponseEntity.ok(new PageImpl<>(sources, PageRequest.of(page, size), sources.size()));
+        sources = service.findByNameContaining(name, pageable);
+        return ResponseEntity.ok(sources);
     }
 
     @GetMapping("/{id}")

@@ -6,15 +6,13 @@ import io.github.ronaldobertolucci.mygames.model.genre.UpdateGenreDto;
 import io.github.ronaldobertolucci.mygames.service.genre.GenreService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/genres")
@@ -27,15 +25,16 @@ public class GenreController {
     public ResponseEntity list(@RequestParam(value="name", required = false) String name,
                                      @RequestParam(value = "page", required = false, defaultValue = "0") int page,
                                      @RequestParam(value = "size", required = false, defaultValue = "20") int size) {
-        List<GenreDto> genres;
+        Page<GenreDto> genres;
+        Pageable pageable = PageRequest.of(page, size);
 
         if (name == null) {
-            genres = service.findAll();
-            return ResponseEntity.ok(new PageImpl<>(genres, PageRequest.of(page, size), genres.size()));
+            genres = service.findAll(pageable);
+            return ResponseEntity.ok(genres);
         }
         
-        genres = service.findByNameContaining(name);
-        return ResponseEntity.ok(new PageImpl<>(genres, PageRequest.of(page, size), genres.size()));
+        genres = service.findByNameContaining(name, pageable);
+        return ResponseEntity.ok(genres);
     }
 
     @GetMapping("/{id}")

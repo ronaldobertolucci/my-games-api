@@ -3,6 +3,8 @@ package io.github.ronaldobertolucci.mygames.service.theme;
 import io.github.ronaldobertolucci.mygames.model.theme.*;
 import io.github.ronaldobertolucci.mygames.model.theme.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,14 +16,24 @@ public class ThemeService {
     @Autowired
     private ThemeRepository repository;
 
+    public Page<ThemeDto> findByNameContaining(String name, Pageable pageable) {
+        Page<Theme> themes = repository.findThemesByNameContaining(name, pageable);
+        return themes.map(ThemeDto::new);
+    }
+
     public List<ThemeDto> findByNameContaining(String name) {
-        List<Theme> companies = repository.findThemesByNameContaining(name);
-        return companies.stream().map(ThemeDto::new).toList();
+        List<Theme> themes = repository.findThemesByNameContaining(name);
+        return themes.stream().map(ThemeDto::new).toList();
+    }
+
+    public Page<ThemeDto> findAll(Pageable pageable) {
+        Page<Theme> themes = repository.findAll(pageable);
+        return themes.map(ThemeDto::new);
     }
 
     public List<ThemeDto> findAll() {
-        List<Theme> companies = repository.findAll();
-        return companies.stream().map(ThemeDto::new).toList();
+        List<Theme> themes = repository.findAll();
+        return themes.stream().map(ThemeDto::new).toList();
     }
 
     public ThemeDto detail(Long id) {

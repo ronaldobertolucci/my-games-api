@@ -2,6 +2,8 @@ package io.github.ronaldobertolucci.mygames.service.platform;
 
 import io.github.ronaldobertolucci.mygames.model.platform.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,9 +15,19 @@ public class PlatformService {
     @Autowired
     private PlatformRepository platformRepository;
 
+    public Page<PlatformDto> findByNameContaining(String name, Pageable pageable) {
+        Page<Platform> platforms = platformRepository.findPlatformsByNameContaining(name, pageable);
+        return platforms.map(PlatformDto::new);
+    }
+
     public List<PlatformDto> findByNameContaining(String name) {
         List<Platform> platforms = platformRepository.findPlatformsByNameContaining(name);
         return platforms.stream().map(PlatformDto::new).toList();
+    }
+
+    public Page<PlatformDto> findAll(Pageable pageable) {
+        Page<Platform> platforms = platformRepository.findAll(pageable);
+        return platforms.map(PlatformDto::new);
     }
 
     public List<PlatformDto> findAll() {

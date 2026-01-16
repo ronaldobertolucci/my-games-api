@@ -17,6 +17,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -56,7 +58,7 @@ class AdminControllerTest {
         PlatformDto platformDto = new PlatformDto(1L, "platform name");
         SourceDto sourceDto = new SourceDto(1L, "source name");
         List<MyGameDto> myGames = List.of(new MyGameDto(1L, 1L, gameDto, platformDto, sourceDto, Status.COMPLETED));
-        when(myGameService.findAll()).thenReturn(myGames);
+        when(myGameService.findAll(any())).thenReturn(new PageImpl<>(myGames, PageRequest.of(0,20), myGames.size()));
 
         mockMvc.perform(get("/admin/my-games"))
                 .andExpect(status().isForbidden());
@@ -69,7 +71,7 @@ class AdminControllerTest {
         PlatformDto platformDto = new PlatformDto(1L, "platform name");
         SourceDto sourceDto = new SourceDto(1L, "source name");
         List<MyGameDto> myGames = List.of(new MyGameDto(1L, 1L, gameDto, platformDto, sourceDto, Status.COMPLETED));
-        when(myGameService.findAll()).thenReturn(myGames);
+        when(myGameService.findAll(any())).thenReturn(new PageImpl<>(myGames, PageRequest.of(0,20), myGames.size()));
 
         mockMvc.perform(get("/admin/my-games")
                         .with(user("user@email.com").roles("USER")))
@@ -83,7 +85,7 @@ class AdminControllerTest {
         PlatformDto platformDto = new PlatformDto(1L, "platform name");
         SourceDto sourceDto = new SourceDto(1L, "source name");
         List<MyGameDto> myGames = List.of(new MyGameDto(1L, 1L, gameDto, platformDto, sourceDto, Status.COMPLETED));
-        when(myGameService.findAll()).thenReturn(myGames);
+        when(myGameService.findAll(any())).thenReturn(new PageImpl<>(myGames, PageRequest.of(0,20), myGames.size()));
 
         mockMvc.perform(get("/admin/my-games")
                         .with(user("admin@admin.com").roles("ADMIN")))
@@ -98,7 +100,7 @@ class AdminControllerTest {
     @Test
     void deveProbirListarTodosOsUsuariosParaNaoAutenticado() throws Exception {
         List<UserDto> users = List.of(new UserDto(1L, "user@email.com", Role.USER, true));
-        when(userService.findAll()).thenReturn(users);
+        when(userService.findAll(any())).thenReturn(new PageImpl<>(users, PageRequest.of(0,20), users.size()));
 
         mockMvc.perform(get("/admin/users"))
                 .andExpect(status().isForbidden());
@@ -107,7 +109,7 @@ class AdminControllerTest {
     @Test
     void deveProbirListarTodosOsUsuariosParaAutenticadoUser() throws Exception {
         List<UserDto> users = List.of(new UserDto(1L, "user@email.com", Role.USER, true));
-        when(userService.findAll()).thenReturn(users);
+        when(userService.findAll(any())).thenReturn(new PageImpl<>(users, PageRequest.of(0,20), users.size()));
 
         mockMvc.perform(get("/admin/users")
                         .with(user("user@email.com").roles("USER")))
@@ -117,7 +119,7 @@ class AdminControllerTest {
     @Test
     void deveListarTodosOsUsuariosParaAutenticadoAdmin() throws Exception {
         List<UserDto> users = List.of(new UserDto(1L, "user@email.com", Role.USER, true));
-        when(userService.findAll()).thenReturn(users);
+        when(userService.findAll(any())).thenReturn(new PageImpl<>(users, PageRequest.of(0,20), users.size()));
 
         mockMvc.perform(get("/admin/users")
                         .with(user("admin@admin.com").roles("ADMIN")))

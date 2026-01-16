@@ -2,6 +2,8 @@ package io.github.ronaldobertolucci.mygames.service.company;
 
 import io.github.ronaldobertolucci.mygames.model.company.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -13,9 +15,19 @@ public class CompanyService {
     @Autowired
     private CompanyRepository repository;
 
+    public Page<CompanyDto> findByNameContaining(String name, Pageable pageable) {
+        Page<Company> companies = repository.findCompaniesByNameContaining(name, pageable);
+        return companies.map(CompanyDto::new);
+    }
+
     public List<CompanyDto> findByNameContaining(String name) {
         List<Company> companies = repository.findCompaniesByNameContaining(name);
         return companies.stream().map(CompanyDto::new).toList();
+    }
+
+    public Page<CompanyDto> findAll(Pageable pageable) {
+        Page<Company> companies = repository.findAll(pageable);
+        return companies.map(CompanyDto::new);
     }
 
     public List<CompanyDto> findAll() {

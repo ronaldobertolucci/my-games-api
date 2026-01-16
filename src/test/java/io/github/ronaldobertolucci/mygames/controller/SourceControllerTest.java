@@ -14,7 +14,6 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
@@ -51,7 +50,8 @@ class SourceControllerTest {
     @Test
     void deveProibirListarTodasAsLojasParaNaoAutenticado() throws Exception {
         List<Source> sources = List.of(new Source(new SaveSourceDto("Source Name")));
-        when(sourceService.findAll()).thenReturn(sources.stream().map(SourceDto::new).toList());
+        when(sourceService.findAll(any())).thenReturn(new PageImpl<>(sources.stream().map(SourceDto::new).toList(),
+                PageRequest.of(0,20), sources.size()));
 
         mockMvc.perform(get("/sources"))
                 .andExpect(status().isForbidden());
@@ -60,7 +60,8 @@ class SourceControllerTest {
     @Test
     void deveListarTodasAsLojasParaAutenticado() throws Exception {
         List<Source> sources = List.of(new Source(new SaveSourceDto("Source Name")));
-        when(sourceService.findAll()).thenReturn(sources.stream().map(SourceDto::new).toList());
+        when(sourceService.findAll(any())).thenReturn(new PageImpl<>(sources.stream().map(SourceDto::new).toList(),
+                PageRequest.of(0,20), sources.size()));
 
         mockMvc.perform(get("/sources")
                         .with(user("test").roles("USER", "ADMIN")))

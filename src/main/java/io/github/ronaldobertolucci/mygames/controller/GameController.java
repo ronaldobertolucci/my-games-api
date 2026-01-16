@@ -6,13 +6,13 @@ import io.github.ronaldobertolucci.mygames.model.game.UpdateGameDto;
 import io.github.ronaldobertolucci.mygames.service.game.GameService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/games")
@@ -25,15 +25,16 @@ public class GameController {
     public ResponseEntity list(@RequestParam(value="title", required = false) String title,
                                      @RequestParam(value = "page", required = false, defaultValue = "0") int page,
                                      @RequestParam(value = "size", required = false, defaultValue = "20") int size) {
-        List<GameDto> games;
+        Page<GameDto> games;
+        Pageable pageable = PageRequest.of(page, size);
 
         if (title == null) {
-            games = service.findAll();
-            return ResponseEntity.ok(new PageImpl<>(games, PageRequest.of(page, size), games.size()));
+            games = service.findAll(pageable);
+            return ResponseEntity.ok(games);
         }
         
-        games = service.findByTitleContaining(title);
-        return ResponseEntity.ok(new PageImpl<>(games, PageRequest.of(page, size), games.size()));
+        games = service.findByTitleContaining(title, pageable);
+        return ResponseEntity.ok(games);
     }
 
     @GetMapping("/{id}")

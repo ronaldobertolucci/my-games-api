@@ -10,6 +10,8 @@ import io.github.ronaldobertolucci.mygames.model.theme.Theme;
 import io.github.ronaldobertolucci.mygames.model.theme.ThemeRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,9 +34,19 @@ public class GameService {
     @Autowired
     private ThemeRepository themeRepository;
 
+    public Page<GameDto> findByTitleContaining(String title, Pageable pageable) {
+        Page<Game> games = gameRepository.findGamesByTitleContaining(title, pageable);
+        return games.map(GameDto::new);
+    }
+
     public List<GameDto> findByTitleContaining(String title) {
         List<Game> games = gameRepository.findGamesByTitleContaining(title);
         return games.stream().map(GameDto::new).toList();
+    }
+
+    public Page<GameDto> findAll(Pageable pageable) {
+        Page<Game> games = gameRepository.findAll(pageable);
+        return games.map(GameDto::new);
     }
 
     public List<GameDto> findAll() {

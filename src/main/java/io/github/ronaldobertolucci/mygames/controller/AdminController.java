@@ -5,13 +5,12 @@ import io.github.ronaldobertolucci.mygames.model.user.UserDto;
 import io.github.ronaldobertolucci.mygames.service.mygame.MyGameService;
 import io.github.ronaldobertolucci.mygames.service.user.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/admin")
@@ -25,14 +24,14 @@ public class AdminController {
 
     @GetMapping("/my-games")
     public ResponseEntity listMyGames(@PageableDefault(size = 20, sort = {"username"}) Pageable pagination) {
-        List<MyGameDto> myGames = myGameService.findAll();
-        return ResponseEntity.ok(new PageImpl<>(myGames, pagination, myGames.size()));
+        Page<MyGameDto> myGames = myGameService.findAll(pagination);
+        return ResponseEntity.ok(myGames);
     }
 
     @GetMapping("/users")
     public ResponseEntity listUsers(@PageableDefault(size = 20, sort = {"username"}) Pageable pagination) {
-        List<UserDto> users = userService.findAll();
-        return ResponseEntity.ok(new PageImpl<>(users, pagination, users.size()));
+        Page<UserDto> users = userService.findAll(pagination);
+        return ResponseEntity.ok(users);
     }
 
     @DeleteMapping("/users/{id}")

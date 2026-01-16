@@ -6,15 +6,13 @@ import io.github.ronaldobertolucci.mygames.model.theme.UpdateThemeDto;
 import io.github.ronaldobertolucci.mygames.service.theme.ThemeService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/themes")
@@ -27,15 +25,16 @@ public class ThemeController {
     public ResponseEntity list(@RequestParam(value="name", required = false) String name,
                                      @RequestParam(value = "page", required = false, defaultValue = "0") int page,
                                      @RequestParam(value = "size", required = false, defaultValue = "20") int size) {
-        List<ThemeDto> themes;
+        Page<ThemeDto> themes;
+        Pageable pageable = PageRequest.of(page, size);
 
         if (name == null) {
-            themes = service.findAll();
-            return ResponseEntity.ok(new PageImpl<>(themes, PageRequest.of(page, size), themes.size()));
+            themes = service.findAll(pageable);
+            return ResponseEntity.ok(themes);
         }
         
-        themes = service.findByNameContaining(name);
-        return ResponseEntity.ok(new PageImpl<>(themes, PageRequest.of(page, size), themes.size()));
+        themes = service.findByNameContaining(name, pageable);
+        return ResponseEntity.ok(themes);
     }
 
     @GetMapping("/{id}")
