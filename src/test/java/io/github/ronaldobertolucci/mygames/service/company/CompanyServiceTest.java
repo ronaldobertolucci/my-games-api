@@ -22,7 +22,7 @@ class CompanyServiceTest {
     @Autowired
     private CompanyService companyService;
     
-        @Test
+    @Test
     @Transactional
     void deveListarVazioSeNomeNaoEncontrado() {
         String name = "Company name";

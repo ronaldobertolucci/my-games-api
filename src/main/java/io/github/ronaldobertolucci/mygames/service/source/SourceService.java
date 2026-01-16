@@ -13,6 +13,11 @@ public class SourceService {
     @Autowired
     private SourceRepository repository;
 
+    public List<SourceDto> findByNameContaining(String name) {
+        List<Source> sources = repository.findSourceByNameContaining(name);
+        return sources.stream().map(SourceDto::new).toList();
+    }
+
     public List<SourceDto> findAll() {
         List<Source> sources = repository.findAll();
         return sources.stream().map(SourceDto::new).toList();

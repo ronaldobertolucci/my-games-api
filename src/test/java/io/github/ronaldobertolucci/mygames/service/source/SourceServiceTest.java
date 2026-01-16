@@ -25,6 +25,29 @@ class SourceServiceTest {
 
     @Test
     @Transactional
+    void deveListarVazioSeNomeNaoEncontrado() {
+        String name = "Source name";
+        SourceDto sourceDto = sourceService.save(new SaveSourceDto(name));
+
+        List<SourceDto> sources = sourceService.findByNameContaining("banana");
+
+        assertEquals(0, sources.size());
+    }
+
+    @Test
+    @Transactional
+    void deveListarPeloNome() {
+        String name = "Source name";
+        SourceDto sourceDto = sourceService.save(new SaveSourceDto(name));
+
+        List<SourceDto> sources = sourceService.findByNameContaining("name");
+
+        assertEquals(name.toLowerCase().trim(), sources.getFirst().name());
+        assertEquals(1, sources.size());
+    }
+    
+    @Test
+    @Transactional
     void deveListarTodos() {
         String name = "Source name";
         SourceDto sourceDto = sourceService.save(new SaveSourceDto(name));
