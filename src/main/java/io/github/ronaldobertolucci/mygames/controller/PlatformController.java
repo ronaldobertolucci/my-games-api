@@ -24,7 +24,7 @@ public class PlatformController {
     @GetMapping
     public ResponseEntity list(@RequestParam(value="name", required = false) String name,
                                      @RequestParam(value = "page", required = false, defaultValue = "0") int page,
-                                     @RequestParam(value = "size", required = false, defaultValue = "10") int size) {
+                                     @RequestParam(value = "size", required = false, defaultValue = "20") int size) {
         List<PlatformDto> platforms;
 
         if (name == null) {
