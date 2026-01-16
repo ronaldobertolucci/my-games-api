@@ -3,7 +3,6 @@ package io.github.ronaldobertolucci.mygames.service.theme;
 import io.github.ronaldobertolucci.mygames.model.theme.ThemeDto;
 import io.github.ronaldobertolucci.mygames.model.theme.SaveThemeDto;
 import io.github.ronaldobertolucci.mygames.model.theme.UpdateThemeDto;
-import io.github.ronaldobertolucci.mygames.service.theme.ThemeService;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,6 +21,29 @@ class ThemeServiceTest {
 
     @Autowired
     private ThemeService themeService;
+
+    @Test
+    @Transactional
+    void deveListarVazioSeNomeNaoEncontrado() {
+        String name = "Theme name";
+        ThemeDto themeDto = themeService.save(new SaveThemeDto(name));
+
+        List<ThemeDto> themes = themeService.findByNameContaining("banana");
+
+        assertEquals(0, themes.size());
+    }
+
+    @Test
+    @Transactional
+    void deveListarPeloNome() {
+        String name = "Theme name";
+        ThemeDto themeDto = themeService.save(new SaveThemeDto(name));
+
+        List<ThemeDto> themes = themeService.findByNameContaining("name");
+
+        assertEquals(name.toLowerCase().trim(), themes.getFirst().name());
+        assertEquals(1, themes.size());
+    }
 
     @Test
     @Transactional

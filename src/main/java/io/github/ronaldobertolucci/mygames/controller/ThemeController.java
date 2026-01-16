@@ -7,6 +7,7 @@ import io.github.ronaldobertolucci.mygames.service.theme.ThemeService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
@@ -23,9 +24,18 @@ public class ThemeController {
     private ThemeService service;
 
     @GetMapping
-    public ResponseEntity list(@PageableDefault(size = 20, sort = {"name"}) Pageable pagination) {
-        List<ThemeDto> themes = service.findAll();
-        return ResponseEntity.ok(new PageImpl<>(themes, pagination, themes.size()));
+    public ResponseEntity list(@RequestParam(value="name", required = false) String name,
+                                     @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+                                     @RequestParam(value = "size", required = false, defaultValue = "20") int size) {
+        List<ThemeDto> themes;
+
+        if (name == null) {
+            themes = service.findAll();
+            return ResponseEntity.ok(new PageImpl<>(themes, PageRequest.of(page, size), themes.size()));
+        }
+        
+        themes = service.findByNameContaining(name);
+        return ResponseEntity.ok(new PageImpl<>(themes, PageRequest.of(page, size), themes.size()));
     }
 
     @GetMapping("/{id}")

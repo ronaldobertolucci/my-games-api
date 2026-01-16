@@ -14,6 +14,11 @@ public class ThemeService {
     @Autowired
     private ThemeRepository repository;
 
+    public List<ThemeDto> findByNameContaining(String name) {
+        List<Theme> companies = repository.findThemesByNameContaining(name);
+        return companies.stream().map(ThemeDto::new).toList();
+    }
+
     public List<ThemeDto> findAll() {
         List<Theme> companies = repository.findAll();
         return companies.stream().map(ThemeDto::new).toList();
