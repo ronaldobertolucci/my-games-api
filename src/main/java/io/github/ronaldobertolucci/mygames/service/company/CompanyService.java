@@ -1,7 +1,6 @@
 package io.github.ronaldobertolucci.mygames.service.company;
 
 import io.github.ronaldobertolucci.mygames.model.company.*;
-import io.github.ronaldobertolucci.mygames.model.company.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +12,11 @@ public class CompanyService {
 
     @Autowired
     private CompanyRepository repository;
+
+    public List<CompanyDto> findByNameContaining(String name) {
+        List<Company> companies = repository.findCompaniesByNameContaining(name);
+        return companies.stream().map(CompanyDto::new).toList();
+    }
 
     public List<CompanyDto> findAll() {
         List<Company> companies = repository.findAll();

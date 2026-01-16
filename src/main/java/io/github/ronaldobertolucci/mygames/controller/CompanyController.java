@@ -7,8 +7,7 @@ import io.github.ronaldobertolucci.mygames.service.company.CompanyService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.web.PageableDefault;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -23,9 +22,18 @@ public class CompanyController {
     private CompanyService service;
 
     @GetMapping
-    public ResponseEntity list(@PageableDefault(size = 20, sort = {"name"}) Pageable pagination) {
-        List<CompanyDto> companies = service.findAll();
-        return ResponseEntity.ok(new PageImpl<>(companies, pagination, companies.size()));
+    public ResponseEntity list(@RequestParam(value="name", required = false) String name,
+                                     @RequestParam(value = "page", required = false, defaultValue = "0") int page,
+                                     @RequestParam(value = "size", required = false, defaultValue = "20") int size) {
+        List<CompanyDto> companies;
+
+        if (name == null) {
+            companies = service.findAll();
+            return ResponseEntity.ok(new PageImpl<>(companies, PageRequest.of(page, size), companies.size()));
+        }
+        
+        companies = service.findByNameContaining(name);
+        return ResponseEntity.ok(new PageImpl<>(companies, PageRequest.of(page, size), companies.size()));
     }
 
     @GetMapping("/{id}")

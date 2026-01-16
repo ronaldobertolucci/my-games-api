@@ -21,6 +21,29 @@ class CompanyServiceTest {
 
     @Autowired
     private CompanyService companyService;
+    
+        @Test
+    @Transactional
+    void deveListarVazioSeNomeNaoEncontrado() {
+        String name = "Company name";
+        CompanyDto companyDto = companyService.save(new SaveCompanyDto(name));
+
+        List<CompanyDto> companies = companyService.findByNameContaining("banana");
+
+        assertEquals(0, companies.size());
+    }
+
+    @Test
+    @Transactional
+    void deveListarPeloNome() {
+        String name = "Company name";
+        CompanyDto companyDto = companyService.save(new SaveCompanyDto(name));
+
+        List<CompanyDto> companies = companyService.findByNameContaining("name");
+
+        assertEquals(name.toLowerCase().trim(), companies.getFirst().name());
+        assertEquals(1, companies.size());
+    }
 
     @Test
     @Transactional
