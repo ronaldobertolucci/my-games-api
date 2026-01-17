@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -23,18 +24,12 @@ public class PlatformController {
 
     @GetMapping
     public ResponseEntity list(@RequestParam(value="name", required = false) String name,
-                                     @RequestParam(value = "page", required = false, defaultValue = "0") int page,
-                                     @RequestParam(value = "size", required = false, defaultValue = "20") int size) {
-        Page<PlatformDto> platforms;
-        Pageable pageable = PageRequest.of(page, size);
-
+                               @PageableDefault(size = 20, sort ={"name"}) Pageable pagination) {
         if (name == null) {
-            platforms = service.findAll(pageable);
-            return ResponseEntity.ok(platforms);
+            return ResponseEntity.ok(service.findAll(pagination));
         }
         
-        platforms = service.findByNameContaining(name, pageable);
-        return ResponseEntity.ok(platforms);
+        return ResponseEntity.ok(service.findByNameContaining(name, pagination));
     }
 
     @GetMapping("/{id}")

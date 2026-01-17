@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
@@ -23,18 +24,12 @@ public class GameController {
 
     @GetMapping
     public ResponseEntity list(@RequestParam(value="title", required = false) String title,
-                                     @RequestParam(value = "page", required = false, defaultValue = "0") int page,
-                                     @RequestParam(value = "size", required = false, defaultValue = "20") int size) {
-        Page<GameDto> games;
-        Pageable pageable = PageRequest.of(page, size);
-
+                               @PageableDefault(size = 20, sort ={"title"}) Pageable pagination) {
         if (title == null) {
-            games = service.findAll(pageable);
-            return ResponseEntity.ok(games);
+            return ResponseEntity.ok(service.findAll(pagination));
         }
-        
-        games = service.findByTitleContaining(title, pageable);
-        return ResponseEntity.ok(games);
+
+        return ResponseEntity.ok(service.findByTitleContaining(title, pagination));
     }
 
     @GetMapping("/{id}")

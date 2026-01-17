@@ -27,16 +27,12 @@ public class MyGameController {
 
     @GetMapping
     public ResponseEntity listByUser(@RequestParam(value="title", required = false) String title,
-                                            @PageableDefault(size = 20, sort = {"game.title"}) Pageable pagination) {
-        Page<MyGameDto> myGames;
-        
+                                     @PageableDefault(size = 20, sort = {"game.title"}) Pageable pagination) {
         if (title == null) {
-            myGames = service.findByUser(getUsername(), pagination);
-            return ResponseEntity.ok(myGames);
+            return ResponseEntity.ok(service.findByUser(getUsername(), pagination));
         }
         
-        myGames = service.findByUserAndGameTitleContaining(getUsername(), title, pagination);
-        return ResponseEntity.ok(myGames);
+        return ResponseEntity.ok(service.findByUserAndGameTitleContaining(getUsername(), title, pagination));
     }
 
     @GetMapping("/{id}")
