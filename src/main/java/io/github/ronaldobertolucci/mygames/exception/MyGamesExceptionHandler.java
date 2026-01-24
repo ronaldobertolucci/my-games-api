@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.orm.ObjectRetrievalFailureException;
 import org.springframework.orm.jpa.JpaObjectRetrievalFailureException;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -45,8 +46,13 @@ public class MyGamesExceptionHandler {
         return ResponseEntity.badRequest().body(ex.getMessage());
     }
 
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity handle401BadCredentials() {
+        return ResponseEntity.status(401).build();
+    }
+
     @ExceptionHandler(InternalAuthenticationServiceException.class)
-    public ResponseEntity handle401() {
+    public ResponseEntity handle401InternalAuthenticationService() {
         return ResponseEntity.status(401).build();
     }
 
