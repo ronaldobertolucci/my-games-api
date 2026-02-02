@@ -23,7 +23,7 @@ public class AdminController {
     private MyGameService myGameService;
 
     @GetMapping("/my-games")
-    public ResponseEntity listMyGames(@PageableDefault(size = 20, sort = {"username"}) Pageable pagination) {
+    public ResponseEntity listMyGames(@PageableDefault(size = 20, sort = {"game.title"}) Pageable pagination) {
         Page<MyGameDto> myGames = myGameService.findAll(pagination);
         return ResponseEntity.ok(myGames);
     }
