@@ -1,9 +1,6 @@
 package io.github.ronaldobertolucci.mygames.controller;
 
-import io.github.ronaldobertolucci.mygames.model.mygame.MyGameDto;
-import io.github.ronaldobertolucci.mygames.model.mygame.MyGamesStatusDto;
-import io.github.ronaldobertolucci.mygames.model.mygame.SaveMyGameDto;
-import io.github.ronaldobertolucci.mygames.model.mygame.UpdateMyGameDto;
+import io.github.ronaldobertolucci.mygames.model.mygame.*;
 import io.github.ronaldobertolucci.mygames.service.mygame.MyGameService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,13 +23,21 @@ public class MyGameController {
     private MyGameService service;
 
     @GetMapping
-    public ResponseEntity listByUser(@RequestParam(value="title", required = false) String title,
-                                     @PageableDefault(size = 20, sort = {"game.title"}) Pageable pagination) {
-        if (title == null) {
-            return ResponseEntity.ok(service.findByUser(getUsername(), pagination));
-        }
-        
-        return ResponseEntity.ok(service.findByUserAndGameTitleContaining(getUsername(), title, pagination));
+    public ResponseEntity listByUser(
+            @RequestParam(required = false) String title,
+            @RequestParam(name = "source_id", required = false) Long sourceId,
+            @RequestParam(name = "platform_id", required = false) Long platformId,
+            @PageableDefault(size = 20, sort = {"game.title"}) Pageable pagination) {
+
+        MyGameFilter filter = MyGameFilter.builder()
+                .username(getUsername())
+                .title(title)
+                .sourceId(sourceId)
+                .platformId(platformId)
+                .build();
+
+        Page<MyGameDto> games = service.findByFilter(filter, pagination);
+        return ResponseEntity.ok(games);
     }
 
     @GetMapping("/{id}")

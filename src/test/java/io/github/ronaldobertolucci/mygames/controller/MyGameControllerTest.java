@@ -5,6 +5,7 @@ import io.github.ronaldobertolucci.mygames.model.company.Company;
 import io.github.ronaldobertolucci.mygames.model.game.Game;
 import io.github.ronaldobertolucci.mygames.model.mygame.MyGame;
 import io.github.ronaldobertolucci.mygames.model.mygame.MyGameDto;
+import io.github.ronaldobertolucci.mygames.model.mygame.MyGameFilter;
 import io.github.ronaldobertolucci.mygames.model.platform.Platform;
 import io.github.ronaldobertolucci.mygames.model.source.Source;
 import io.github.ronaldobertolucci.mygames.model.user.User;
@@ -18,6 +19,7 @@ import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.orm.ObjectRetrievalFailureException;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -61,7 +63,8 @@ class MyGameControllerTest {
     @Test
     void deveListarTodosOsMeusJogosParaAutenticado() throws Exception {
         List<MyGameDto> myGames = List.of(new MyGameDto(getGenericMyGame()));
-        when(myGameService.findByUser(any(), any())).thenReturn(new PageImpl<>(myGames, PageRequest.of(0,20), myGames.size()));
+        when(myGameService.findByFilter(any(MyGameFilter.class), any(Pageable.class)))
+                .thenReturn(new PageImpl<>(myGames, PageRequest.of(0, 20), myGames.size()));
 
         mockMvc.perform(get("/my-games")
                         .with(user("test").roles("USER", "ADMIN")))

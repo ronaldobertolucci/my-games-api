@@ -19,6 +19,8 @@ import org.mockito.MockedStatic;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.test.autoconfigure.AutoConfigureTestDatabase;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -127,10 +129,122 @@ class MyGameServiceTest {
         myGameService.save(new SaveMyGameDto(game.getId(), platform.getId(), source.getId(), null), "username1");
         myGameService.save(new SaveMyGameDto(game.getId(), platform.getId(), source.getId(), null), "username2");
 
-        List<MyGameDto> myGames = myGameService.findByUser("username1");
+        MyGameFilter filter = MyGameFilter.builder()
+                .username("username1")
+                .build();
 
-        assertEquals(1, myGames.size());
-        assertEquals(user1.getId(), myGames.getFirst().userId());
+        Page<MyGameDto> myGames = myGameService.findByFilter(filter, Pageable.unpaged());
+
+        assertEquals(1, myGames.getTotalElements());
+        assertEquals(user1.getId(), myGames.getContent().getFirst().userId());
+    }
+
+    @Test
+    @Transactional
+    void deveListarMeusJogosFiltradosPorTitulo() {
+        Platform platform = platformRepository.save(getPlatform(null, "PC"));
+        Source source = sourceRepository.save(getSource(null, "Steam"));
+        Company company = companyRepository.save(getCompany(null, "CD Projekt"));
+
+        Game witcher = gameRepository.save(getGame(null, "The Witcher", company));
+        Game cyberpunk = gameRepository.save(getGame(null, "Cyberpunk 2077", company));
+
+        User user = userRepository.save(getUser(null, "username1", "123456", Role.USER));
+        myGameService.save(new SaveMyGameDto(witcher.getId(), platform.getId(), source.getId(), null), "username1");
+        myGameService.save(new SaveMyGameDto(cyberpunk.getId(), platform.getId(), source.getId(), null), "username1");
+
+        MyGameFilter filter = MyGameFilter.builder()
+                .username("username1")
+                .title("Witcher")
+                .build();
+
+        Page<MyGameDto> myGames = myGameService.findByFilter(filter, Pageable.unpaged());
+
+        assertEquals(1, myGames.getTotalElements());
+        assertEquals("the witcher", myGames.getContent().getFirst().game().title());
+    }
+
+    @Test
+    @Transactional
+    void deveListarMeusJogosFiltradosPorPlataforma() {
+        Platform pc = platformRepository.save(getPlatform(null, "PC"));
+        Platform ps5 = platformRepository.save(getPlatform(null, "PS5"));
+        Source source = sourceRepository.save(getSource(null, "Steam"));
+        Company company = companyRepository.save(getCompany(null, "CD Projekt"));
+        Game game = gameRepository.save(getGame(null, "The Witcher", company));
+
+        User user = userRepository.save(getUser(null, "username1", "123456", Role.USER));
+        myGameService.save(new SaveMyGameDto(game.getId(), pc.getId(), source.getId(), null), "username1");
+        myGameService.save(new SaveMyGameDto(game.getId(), ps5.getId(), source.getId(), null), "username1");
+
+        MyGameFilter filter = MyGameFilter.builder()
+                .username("username1")
+                .platformId(pc.getId())
+                .build();
+
+        Page<MyGameDto> myGames = myGameService.findByFilter(filter, Pageable.unpaged());
+
+        assertEquals(1, myGames.getTotalElements());
+        assertEquals("pc", myGames.getContent().getFirst().platform().name());
+    }
+
+    @Test
+    @Transactional
+    void deveListarMeusJogosFiltradosPorSource() {
+        Platform platform = platformRepository.save(getPlatform(null, "PC"));
+        Source steam = sourceRepository.save(getSource(null, "Steam"));
+        Source gog = sourceRepository.save(getSource(null, "GOG"));
+        Company company = companyRepository.save(getCompany(null, "CD Projekt"));
+        Game game = gameRepository.save(getGame(null, "The Witcher", company));
+
+        User user = userRepository.save(getUser(null, "username1", "123456", Role.USER));
+        myGameService.save(new SaveMyGameDto(game.getId(), platform.getId(), steam.getId(), null), "username1");
+        myGameService.save(new SaveMyGameDto(game.getId(), platform.getId(), gog.getId(), null), "username1");
+
+        MyGameFilter filter = MyGameFilter.builder()
+                .username("username1")
+                .sourceId(steam.getId())
+                .build();
+
+        Page<MyGameDto> myGames = myGameService.findByFilter(filter, Pageable.unpaged());
+
+        assertEquals(1, myGames.getTotalElements());
+        assertEquals("steam", myGames.getContent().getFirst().source().name());
+    }
+
+    @Test
+    @Transactional
+    void deveListarMeusJogosComMultiplosFiltros() {
+        Platform pc = platformRepository.save(getPlatform(null, "PC"));
+        Platform ps5 = platformRepository.save(getPlatform(null, "PS5"));
+        Source steam = sourceRepository.save(getSource(null, "Steam"));
+        Company company = companyRepository.save(getCompany(null, "CD Projekt"));
+
+        Game witcher = gameRepository.save(getGame(null, "The Witcher", company));
+        Game cyberpunk = gameRepository.save(getGame(null, "Cyberpunk 2077", company));
+
+        User user = userRepository.save(getUser(null, "username1", "123456", Role.USER));
+
+        // Witcher no PC via Steam
+        myGameService.save(new SaveMyGameDto(witcher.getId(), pc.getId(), steam.getId(), null), "username1");
+        // Cyberpunk no PC via Steam
+        myGameService.save(new SaveMyGameDto(cyberpunk.getId(), pc.getId(), steam.getId(), null), "username1");
+        // Witcher no PS5 via Steam
+        myGameService.save(new SaveMyGameDto(witcher.getId(), ps5.getId(), steam.getId(), null), "username1");
+
+        MyGameFilter filter = MyGameFilter.builder()
+                .username("username1")
+                .title("Witcher")
+                .platformId(pc.getId())
+                .sourceId(steam.getId())
+                .build();
+
+        Page<MyGameDto> myGames = myGameService.findByFilter(filter, Pageable.unpaged());
+
+        assertEquals(1, myGames.getTotalElements());
+        assertEquals("the witcher", myGames.getContent().getFirst().game().title());
+        assertEquals("pc", myGames.getContent().getFirst().platform().name());
+        assertEquals("steam", myGames.getContent().getFirst().source().name());
     }
 
     @Test
