@@ -3,6 +3,8 @@ package io.github.ronaldobertolucci.mygames.config;
 import io.github.ronaldobertolucci.mygames.model.user.Role;
 import io.github.ronaldobertolucci.mygames.model.user.User;
 import io.github.ronaldobertolucci.mygames.model.user.UserRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
@@ -18,15 +20,25 @@ public class AdminInitializer implements ApplicationRunner {
     
     @Autowired
     private PasswordEncoder passwordEncoder;
+
+    @Value("${admin.initialization.enabled:false}")
+    private boolean adminInitEnabled;
     
-    @Value("${admin.email:admin@example.com}")
+    @Value("${admin.email}")
     private String adminEmail;
     
-    @Value("${admin.password:admin123}")
+    @Value("${admin.password}")
     private String adminPassword;
+
+    private static final Logger logger = LoggerFactory.getLogger(AdminInitializer.class);
     
     @Override
     public void run(ApplicationArguments args) throws Exception {
+        if (!adminInitEnabled) {
+            logger.info("Admin initialization disabled");
+            return;
+        }
+
         if (!userRepository.existsByUsername(adminEmail)) {
             User admin = new User();
             admin.setUsername(adminEmail);
