@@ -46,6 +46,11 @@ public class MyGamesExceptionHandler {
         return ResponseEntity.badRequest().body(ex.getMessage());
     }
 
+    @ExceptionHandler(InvalidTokenException.class)
+    public ResponseEntity handle400(InvalidTokenException ex) {
+        return ResponseEntity.status(400).body(ex.getMessage());
+    }
+
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity handle401BadCredentials() {
         return ResponseEntity.status(401).build();
@@ -54,6 +59,11 @@ public class MyGamesExceptionHandler {
     @ExceptionHandler(InternalAuthenticationServiceException.class)
     public ResponseEntity handle401InternalAuthenticationService() {
         return ResponseEntity.status(401).build();
+    }
+
+    @ExceptionHandler(TokenExpiredException.class)
+    public ResponseEntity handle401(TokenExpiredException ex) {
+        return ResponseEntity.status(401).body(ex.getMessage());
     }
 
     @ExceptionHandler(ForbiddenException.class)
@@ -86,9 +96,14 @@ public class MyGamesExceptionHandler {
         return ResponseEntity.status(422).body(ex.getMessage());
     }
 
+    @ExceptionHandler(EmailException.class)
+    public ResponseEntity handle503(EmailException ex) {
+        return ResponseEntity.status(503).body(ex.getMessage());
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity handle500() {
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Internal Server Error");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro interno do servidor");
     }
 
     private record ErrorValidation(String field, String message) {
