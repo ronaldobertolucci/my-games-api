@@ -10,4 +10,5 @@ public class MyGameFilter {
     private String title;
     private Long sourceId;
     private Long platformId;
+    private Status status;
 }

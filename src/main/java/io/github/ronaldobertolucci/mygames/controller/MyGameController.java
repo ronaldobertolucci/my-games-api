@@ -27,6 +27,7 @@ public class MyGameController {
             @RequestParam(required = false) String title,
             @RequestParam(name = "source_id", required = false) Long sourceId,
             @RequestParam(name = "platform_id", required = false) Long platformId,
+            @RequestParam(name = "status", required = false) Status status,
             @PageableDefault(size = 20, sort = {"game.title"}) Pageable pagination) {
 
         MyGameFilter filter = MyGameFilter.builder()
@@ -34,6 +35,7 @@ public class MyGameController {
                 .title(title)
                 .sourceId(sourceId)
                 .platformId(platformId)
+                .status(status)
                 .build();
 
         Page<MyGameDto> games = service.findByFilter(filter, pagination);

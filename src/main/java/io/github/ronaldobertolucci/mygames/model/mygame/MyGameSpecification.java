@@ -30,6 +30,10 @@ public class MyGameSpecification {
             if (filter.getPlatformId() != null) {
                 predicates.add(cb.equal(root.get("platform").get("id"), filter.getPlatformId()));
             }
+
+            if (filter.getStatus() != null) {
+                predicates.add(cb.equal(root.get("status"), filter.getStatus()));
+            }
             
             return cb.and(predicates.toArray(new Predicate[0]));
         };
