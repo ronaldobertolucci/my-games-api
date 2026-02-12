@@ -31,8 +31,8 @@ public class MyGameSpecification {
                 predicates.add(cb.equal(root.get("platform").get("id"), filter.getPlatformId()));
             }
 
-            if (filter.getStatus() != null) {
-                predicates.add(cb.equal(root.get("status"), filter.getStatus()));
+            if (filter.getStatuses() != null && !filter.getStatuses().isEmpty()) {
+                predicates.add(root.get("status").in(filter.getStatuses()));
             }
             
             return cb.and(predicates.toArray(new Predicate[0]));

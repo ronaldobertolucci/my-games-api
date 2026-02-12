@@ -14,6 +14,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
+import java.util.List;
+
 
 @RestController
 @RequestMapping("/my-games")
@@ -27,7 +29,7 @@ public class MyGameController {
             @RequestParam(required = false) String title,
             @RequestParam(name = "source_id", required = false) Long sourceId,
             @RequestParam(name = "platform_id", required = false) Long platformId,
-            @RequestParam(name = "status", required = false) Status status,
+            @RequestParam(name = "status", required = false) List<Status> statuses,
             @PageableDefault(size = 20, sort = {"game.title"}) Pageable pagination) {
 
         MyGameFilter filter = MyGameFilter.builder()
@@ -35,7 +37,7 @@ public class MyGameController {
                 .title(title)
                 .sourceId(sourceId)
                 .platformId(platformId)
-                .status(status)
+                .statuses(statuses)
                 .build();
 
         Page<MyGameDto> games = service.findByFilter(filter, pagination);
