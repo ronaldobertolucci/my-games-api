@@ -1,6 +1,6 @@
 # My Games API
 
-Esse projeto foi gerado usando Spring Boot 4.0.1 e Java 17
+Esse projeto foi gerado usando Spring Boot 4.0.1 e Java 21
 
 ## Rodando com Docker
 

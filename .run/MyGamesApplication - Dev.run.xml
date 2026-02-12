@@ -2,7 +2,7 @@
   <configuration default="false" name="MyGamesApplication - Dev" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
     <option name="ACTIVE_PROFILES" value="dev" />
     <option name="FRAME_DEACTIVATION_UPDATE_POLICY" value="UpdateClassesAndResources" />
-    <module name="mygames" />
+    <module name="my-games-api" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="io.github.ronaldobertolucci.mygames.MyGamesApplication" />
     <method v="2">
       <option name="Make" enabled="true" />
